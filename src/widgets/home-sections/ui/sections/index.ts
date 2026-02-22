@@ -1,0 +1,7 @@
+export { AboutSection } from './AboutSection'
+export { ContactSection } from './ContactSection'
+export { HeroSection } from './HeroSection'
+export { HomeFooter } from './HomeFooter'
+export { MatrixCubeSection } from './MatrixCubeSection'
+export { ProjectsSection } from './ProjectsSection'
+export { QuickEvidenceSection } from './QuickEvidenceSection'

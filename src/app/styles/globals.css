@@ -1,0 +1,127 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Newsreader:opsz,wght@6..72,600&display=swap');
+@import 'tailwindcss';
+
+:root {
+  --bg-main: #fffdf7;
+  --bg-glass: rgb(255 253 247 / 0.86);
+  --text-main: #19242f;
+  --text-soft: #4a5c70;
+  --border-soft: rgb(25 36 47 / 0.14);
+  --brand-ink: #0c6b8f;
+  --brand-mist: rgb(12 107 143 / 0.26);
+  --accent-ink: #bf5a2a;
+  --accent-mist: rgb(191 90 42 / 0.2);
+  --ascii-rain-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='8' y='18' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E0 1 0 1 : ; . + -%3C/text%3E%3Ctext x='18' y='50' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Eapi data sql etl py rx%3C/text%3E%3Ctext x='34' y='84' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E/%20/%20|%20%5C%20|%20/%20_%20_%3C/text%3E%3Ctext x='10' y='120' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Edocker flask react jwt%3C/text%3E%3Ctext x='28' y='156' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Ebatch sync io queue api%3C/text%3E%3Ctext x='16' y='194' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E0x01 0x02 0x03 0x04%3C/text%3E%3C/svg%3E");
+  --ascii-rain-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Ctext x='20' y='24' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E%23include + return - main%3C/text%3E%3Ctext x='12' y='64' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Eif else while for await%3C/text%3E%3Ctext x='34' y='102' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E001101 101100 010101%3C/text%3E%3Ctext x='18' y='144' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Ejson csv sql api queue%3C/text%3E%3Ctext x='28' y='186' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Etrace log event stream%3C/text%3E%3Ctext x='14' y='230' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E/%20|%20%5C%20_%20-%20+%20:%20;%3C/text%3E%3C/svg%3E");
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background: var(--bg-main);
+  position: relative;
+  overflow-x: hidden;
+  color: var(--text-main);
+  font-family: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body::before,
+body::after {
+  content: '';
+  position: fixed;
+  inset: -24vh -8vw 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body::before {
+  background-image: var(--ascii-rain-a), var(--ascii-rain-b);
+  background-position:
+    0 0,
+    110px -160px;
+  background-repeat: repeat;
+  background-size:
+    220px 220px,
+    260px 260px;
+  opacity: 0.58;
+  animation: ascii-rain-fall 24s linear infinite;
+}
+
+body::after {
+  background-image: var(--ascii-rain-b);
+  background-position: 70px -140px;
+  background-repeat: repeat;
+  background-size: 280px 280px;
+  opacity: 0.3;
+  filter: blur(0.3px);
+  animation: ascii-rain-drift 32s linear infinite;
+}
+
+#root {
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes ascii-rain-fall {
+  from {
+    background-position:
+      0 0,
+      110px -160px;
+  }
+  to {
+    background-position:
+      0 260px,
+      110px 120px;
+  }
+}
+
+@keyframes ascii-rain-drift {
+  from {
+    background-position: 70px -140px;
+  }
+  to {
+    background-position: 40px 180px;
+  }
+}
+
+h1,
+h2,
+h3 {
+  letter-spacing: -0.02em;
+}
+
+h1,
+h2 {
+  font-family: 'Newsreader', Georgia, serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::selection {
+  background: var(--brand-mist);
+}
