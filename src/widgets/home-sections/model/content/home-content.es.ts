@@ -80,7 +80,7 @@ export const homeContentEs: HomeContent = {
     },
     status: {
       error: 'No se pudo enviar el mensaje. Intenta de nuevo en unos minutos.',
-      missingEndpoint: 'Falta configurar VITE_CONTACT_FORM_ENDPOINT en el entorno.',
+      missingEndpoint: 'Formulario temporalmente no disponible. Escríbeme al email directo.',
       required: 'Completa nombre, email y mensaje antes de enviar.',
       sending: 'Enviando mensaje...',
       success: 'Mensaje enviado correctamente. Te responderé pronto.',
@@ -172,6 +172,26 @@ export const homeContentEs: HomeContent = {
       stack: ['Python', 'Flask/FastAPI', 'JWT', 'SQLAlchemy', 'Postgres', 'Docker'],
       result: 'Seguridad consistente y código mantenible con separación de responsabilidades.',
       metric: 'Placeholder: reducción de errores auth X% y onboarding en Y horas.',
+    },
+    {
+      tag: 'Frontend',
+      title: 'Jensen Pharmaceutical (sitio web corporativo)',
+      demoLabel: 'Sitio web',
+      coverImage: '/jensen.png',
+      problem:
+        'El sitio necesitaba una experiencia más clara para presentar servicios, confianza de marca y contacto rápido.',
+      role: 'Implementación frontend, estructura de secciones, mejoras visuales y optimización de navegación.',
+      solution:
+        'Interfaz enfocada en claridad de contenido, jerarquía visual y flujo directo hacia formularios de contacto.',
+      stack: ['Frontend', 'React', 'TypeScript', 'Tailwind CSS', 'Diseño responsive'],
+      result:
+        'Navegación más simple, mensaje de marca más claro y experiencia más consistente en móvil y desktop.',
+      metric: 'Placeholder: mejora en tiempo en página, CTR de contacto y reducción de rebote.',
+      links: {
+        demo: 'https://jensenpharmaceutical.com/',
+        repo: 'https://jensenpharmaceutical.com/',
+        docs: 'https://jensenpharmaceutical.com/',
+      },
     },
     {
       tag: 'Data',

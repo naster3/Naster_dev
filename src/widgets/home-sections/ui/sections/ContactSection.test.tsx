@@ -25,9 +25,7 @@ describe('ContactSection', () => {
     await user.type(screen.getByLabelText(/Mensaje/i), 'Hola, quiero colaborar.')
     await user.click(screen.getByRole('button', { name: /Enviar/i }))
 
-    expect(
-      await screen.findByText(/Falta configurar VITE_CONTACT_FORM_ENDPOINT/i),
-    ).toBeInTheDocument()
+    expect(await screen.findByText(/Formulario temporalmente no disponible/i)).toBeInTheDocument()
     expect(fetchMock).not.toHaveBeenCalled()
   })
 
@@ -41,7 +39,7 @@ describe('ContactSection', () => {
 
     await user.type(screen.getByLabelText(/Nombre/i), 'Manuel')
     await user.type(screen.getByLabelText(/Email/i), 'manuel@email.com')
-    await user.selectOptions(screen.getByLabelText(/Tipo de proyecto/i), 'API')
+    await user.selectOptions(screen.getByLabelText(/Tipo de proyecto/i), 'api')
     await user.type(screen.getByLabelText(/Mensaje/i), 'Necesito una API con autenticacion.')
     await user.click(screen.getByRole('button', { name: /Enviar/i }))
 
@@ -62,7 +60,7 @@ describe('ContactSection', () => {
       email: 'manuel@email.com',
       message: 'Necesito una API con autenticacion.',
       name: 'Manuel',
-      projectType: 'API',
+      projectType: 'api',
       source: 'portfolio-web',
     })
 
@@ -112,5 +110,51 @@ describe('ContactSection', () => {
     await user.click(screen.getByRole('button', { name: /Enviar/i }))
 
     expect(await screen.findByText(/No se pudo enviar el mensaje/i)).toBeInTheDocument()
+  })
+
+  it('muestra errores por campo y limpia el error al corregir', async () => {
+    vi.stubEnv('VITE_CONTACT_FORM_ENDPOINT', 'https://example.com/contact')
+    const fetchMock = vi.fn()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    const user = userEvent.setup()
+    render(<ContactSection />)
+
+    await user.type(screen.getByLabelText(/Nombre/i), '   ')
+    await user.type(screen.getByLabelText(/Email/i), 'manuel@email.com')
+    await user.type(screen.getByLabelText(/Mensaje/i), '   ')
+    await user.click(screen.getByRole('button', { name: /Enviar/i }))
+
+    expect(await screen.findByText(/Completa el campo Nombre/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Completa el campo Mensaje/i)).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
+
+    await user.type(screen.getByLabelText(/Nombre/i), 'Manuel')
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Completa el campo Nombre/i)).not.toBeInTheDocument()
+    })
+  })
+
+  it('resetea estado visual al editar despues de un error', async () => {
+    vi.stubEnv('VITE_CONTACT_FORM_ENDPOINT', '')
+    const fetchMock = vi.fn()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    const user = userEvent.setup()
+    render(<ContactSection />)
+
+    await user.type(screen.getByLabelText(/Nombre/i), 'Manuel')
+    await user.type(screen.getByLabelText(/Email/i), 'manuel@email.com')
+    await user.type(screen.getByLabelText(/Mensaje/i), 'Hola, quiero colaborar.')
+    await user.click(screen.getByRole('button', { name: /Enviar/i }))
+
+    expect(await screen.findByText(/Formulario temporalmente no disponible/i)).toBeInTheDocument()
+
+    await user.type(screen.getByLabelText(/Mensaje/i), ' Gracias.')
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Formulario temporalmente no disponible/i)).not.toBeInTheDocument()
+    })
   })
 })

@@ -8,7 +8,10 @@ import { primaryBtnClass } from '../styles'
 export function ContactSection() {
   const { locale } = useI18n()
   const content = homeContentByLocale[locale]
-  const { handleSubmit, isSubmitting, status } = useContactForm(content.contact)
+  const { fieldErrors, handleFieldInput, handleSubmit, isSubmitting, status } = useContactForm(
+    content.contact,
+    locale,
+  )
 
   return (
     <motion.section
@@ -22,10 +25,19 @@ export function ContactSection() {
       <h2 className="text-4xl text-(--text-main) md:text-5xl">{content.contact.title}</h2>
       <div className="grid gap-8 md:grid-cols-12">
         <form
+          onInput={handleFieldInput}
           onSubmit={handleSubmit}
           aria-busy={isSubmitting}
-          className="space-y-4 rounded-2xl border border-(--border-soft) bg-white/85 p-6 md:col-span-7"
+          className="space-y-4 rounded-2xl border border-(--border-soft) bg-(--surface-1) p-6 md:col-span-7"
         >
+          <input
+            type="text"
+            name="company"
+            autoComplete="off"
+            tabIndex={-1}
+            aria-hidden="true"
+            className="hidden"
+          />
           <div className="space-y-1">
             <label htmlFor="name" className="text-sm font-medium text-(--text-main)">
               {content.contact.form.name}
@@ -35,9 +47,17 @@ export function ContactSection() {
               name="name"
               type="text"
               required
+              disabled={isSubmitting}
               autoComplete="name"
-              className="w-full rounded-xl border border-(--border-soft) bg-white px-3 py-2"
+              aria-invalid={Boolean(fieldErrors.name)}
+              aria-describedby={fieldErrors.name ? 'contact-name-error' : undefined}
+              className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-3 py-2 text-(--text-main) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-mist)"
             />
+            {fieldErrors.name ? (
+              <p id="contact-name-error" className="text-xs text-(--status-error)" role="alert">
+                {fieldErrors.name}
+              </p>
+            ) : null}
           </div>
           <div className="space-y-1">
             <label htmlFor="email" className="text-sm font-medium text-(--text-main)">
@@ -48,9 +68,17 @@ export function ContactSection() {
               name="email"
               type="email"
               required
+              disabled={isSubmitting}
               autoComplete="email"
-              className="w-full rounded-xl border border-(--border-soft) bg-white px-3 py-2"
+              aria-invalid={Boolean(fieldErrors.email)}
+              aria-describedby={fieldErrors.email ? 'contact-email-error' : undefined}
+              className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-3 py-2 text-(--text-main) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-mist)"
             />
+            {fieldErrors.email ? (
+              <p id="contact-email-error" className="text-xs text-(--status-error)" role="alert">
+                {fieldErrors.email}
+              </p>
+            ) : null}
           </div>
           <div className="space-y-1">
             <label htmlFor="projectType" className="text-sm font-medium text-(--text-main)">
@@ -59,12 +87,13 @@ export function ContactSection() {
             <select
               id="projectType"
               name="projectType"
-              className="w-full rounded-xl border border-(--border-soft) bg-white px-3 py-2"
+              disabled={isSubmitting}
+              className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-3 py-2 text-(--text-main) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-mist)"
             >
-              <option>{content.contact.options.web}</option>
-              <option>{content.contact.options.api}</option>
-              <option>{content.contact.options.data}</option>
-              <option>{content.contact.options.other}</option>
+              <option value="web">{content.contact.options.web}</option>
+              <option value="api">{content.contact.options.api}</option>
+              <option value="data">{content.contact.options.data}</option>
+              <option value="other">{content.contact.options.other}</option>
             </select>
           </div>
           <div className="space-y-1">
@@ -76,8 +105,16 @@ export function ContactSection() {
               name="message"
               rows={5}
               required
-              className="w-full rounded-xl border border-(--border-soft) bg-white px-3 py-2"
+              disabled={isSubmitting}
+              aria-invalid={Boolean(fieldErrors.message)}
+              aria-describedby={fieldErrors.message ? 'contact-message-error' : undefined}
+              className="w-full rounded-xl border border-(--border-soft) bg-(--input-bg) px-3 py-2 text-(--text-main) focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-mist)"
             />
+            {fieldErrors.message ? (
+              <p id="contact-message-error" className="text-xs text-(--status-error)" role="alert">
+                {fieldErrors.message}
+              </p>
+            ) : null}
           </div>
           <button
             type="submit"
@@ -91,12 +128,14 @@ export function ContactSection() {
               className={cn(
                 'text-sm',
                 status.type === 'error'
-                  ? 'text-red-600'
+                  ? 'text-(--status-error)'
                   : status.type === 'success'
-                    ? 'text-green-700'
+                    ? 'text-(--status-success)'
                     : 'text-(--text-soft)',
               )}
-              role="status"
+              role={status.type === 'error' ? 'alert' : 'status'}
+              aria-live={status.type === 'error' ? 'assertive' : 'polite'}
+              aria-atomic="true"
             >
               {status.message}
             </p>
@@ -104,7 +143,7 @@ export function ContactSection() {
         </form>
 
         <aside className="space-y-3 md:col-span-5">
-          <article className="rounded-2xl border border-(--border-soft) bg-white/85 p-5">
+          <article className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-5">
             <h3 className="font-semibold text-(--text-main)">
               {content.contact.subtitleCards.directEmail}
             </h3>
@@ -116,7 +155,7 @@ export function ContactSection() {
               {portfolioLinks.contactEmail}
             </a>
           </article>
-          <article className="rounded-2xl border border-(--border-soft) bg-white/85 p-5">
+          <article className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-5">
             <h3 className="font-semibold text-(--text-main)">
               {content.contact.subtitleCards.scheduleCall}
             </h3>
@@ -130,7 +169,7 @@ export function ContactSection() {
               {content.contact.subtitleCards.calendly}
             </a>
           </article>
-          <article className="rounded-2xl border border-(--border-soft) bg-white/85 p-5">
+          <article className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-5">
             <h3 className="font-semibold text-(--text-main)">
               {content.contact.subtitleCards.networks}
             </h3>

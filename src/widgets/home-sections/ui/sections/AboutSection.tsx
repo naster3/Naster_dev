@@ -18,7 +18,7 @@ export function AboutSection() {
       className="space-y-8"
     >
       <motion.header variants={sectionReveal} className="space-y-3">
-        <p className="inline-flex items-center gap-2 rounded-full border border-(--border-soft) bg-white px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-(--text-soft)">
+        <p className="inline-flex items-center gap-2 rounded-full border border-(--border-soft) bg-(--surface-solid) px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-(--text-soft)">
           <Sparkles size={14} />
           {content.about.eyebrow}
         </p>
@@ -37,7 +37,7 @@ export function AboutSection() {
             {content.about.credentials.map((item) => (
               <span
                 key={item}
-                className="inline-flex items-center gap-1 rounded-full border border-(--border-soft) bg-white/85 px-4 py-2 text-sm text-(--text-main)"
+                className="inline-flex items-center gap-1 rounded-full border border-(--border-soft) bg-(--surface-1) px-4 py-2 text-sm text-(--text-main)"
               >
                 <BadgeCheck size={14} className="text-(--brand-ink)" />
                 {item}
@@ -51,7 +51,7 @@ export function AboutSection() {
         {content.about.blocks.map((block) => (
           <article
             key={block.title}
-            className="rounded-2xl border border-(--border-soft) bg-white/80 p-6 md:col-span-6"
+            className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-6 md:col-span-6"
           >
             <h3 className="text-lg font-semibold text-(--text-main)">{block.title}</h3>
             <ul className="mt-3 space-y-2 text-(--text-soft)">

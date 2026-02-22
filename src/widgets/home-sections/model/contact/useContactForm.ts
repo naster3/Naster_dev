@@ -1,4 +1,5 @@
 import { useReducer, type FormEvent } from 'react'
+import type { Locale } from '@/shared/i18n'
 import type { HomeContent } from '../content'
 
 type FormStatus = {
@@ -7,132 +8,87 @@ type FormStatus = {
 }
 
 type ContactFormData = {
+  company: string
   email: string
   message: string
   name: string
   projectType: string
 }
 
-type ContactFormState =
-  | { tag: 'idle' }
-  | { tag: 'validating'; form: ContactFormData }
-  | { tag: 'sending'; form: ContactFormData; message: string }
-  | { tag: 'success'; message: string }
-  | { tag: 'error'; message: string }
+type ContactField = 'email' | 'message' | 'name'
+type ContactFieldErrors = Partial<Record<ContactField, string>>
+
+type ContactFormState = {
+  fieldErrors: ContactFieldErrors
+  form: ContactFormData | null
+  message: string
+  tag: 'error' | 'idle' | 'sending' | 'success' | 'validating'
+}
 
 type ContactFormEvent =
   | { type: 'SUBMIT'; form: ContactFormData }
   | { type: 'VALIDATION_PASSED'; message: string }
-  | { type: 'VALIDATION_FAILED'; message: string }
+  | { type: 'VALIDATION_FAILED'; message: string; fieldErrors?: ContactFieldErrors }
   | { type: 'SEND_SUCCESS'; message: string }
   | { type: 'SEND_FAILED'; message: string }
+  | { type: 'CLEAR_FIELD_ERROR'; field: ContactField }
   | { type: 'RESET' }
 
 type ContactContent = HomeContent['contact']
 
-function transitionContactFormState(
-  state: ContactFormState,
-  event: ContactFormEvent,
-): ContactFormState {
-  switch (state.tag) {
-    case 'idle':
-    case 'success':
-    case 'error':
-      if (event.type === 'SUBMIT') {
-        return { tag: 'validating', form: event.form }
-      }
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const contactFields: readonly ContactField[] = ['name', 'email', 'message']
 
-      if (event.type === 'RESET') {
-        return { tag: 'idle' }
-      }
-
-      return state
-
-    case 'validating':
-      if (event.type === 'VALIDATION_PASSED') {
-        return { tag: 'sending', form: state.form, message: event.message }
-      }
-
-      if (event.type === 'VALIDATION_FAILED') {
-        return { tag: 'error', message: event.message }
-      }
-
-      return state
-
-    case 'sending':
-      if (event.type === 'SEND_SUCCESS') {
-        return { tag: 'success', message: event.message }
-      }
-
-      if (event.type === 'SEND_FAILED') {
-        return { tag: 'error', message: event.message }
-      }
-
-      return state
-  }
+function isContactField(value: string): value is ContactField {
+  return contactFields.some((field) => field === value)
 }
 
-function getStatusFromState(state: ContactFormState, sendingMessage: string): FormStatus {
-  switch (state.tag) {
-    case 'idle':
-      return { type: 'idle', message: '' }
-    case 'validating':
-      return { type: 'sending', message: sendingMessage }
-    case 'sending':
-      return { type: 'sending', message: state.message }
-    case 'success':
-      return { type: 'success', message: state.message }
-    case 'error':
-      return { type: 'error', message: state.message }
-  }
+function buildRequiredFieldMessage(label: string, locale: Locale) {
+  return locale === 'es' ? `Completa el campo ${label}.` : `Please complete ${label}.`
 }
 
-export function useContactForm(content: ContactContent) {
-  const [state, dispatch] = useReducer(transitionContactFormState, {
-    tag: 'idle',
-  } satisfies ContactFormState)
-  const status = getStatusFromState(state, content.status.sending)
-  const isSubmitting = state.tag === 'validating' || state.tag === 'sending'
-  const contactFormEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim()
+function buildInvalidEmailMessage(locale: Locale) {
+  return locale === 'es' ? 'Escribe un email válido.' : 'Enter a valid email address.'
+}
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    if (isSubmitting) return
+function validateContactPayload(
+  payload: ContactFormData,
+  content: ContactContent,
+  locale: Locale,
+): ContactFieldErrors {
+  const errors: ContactFieldErrors = {}
 
-    const form = event.currentTarget
-    const formData = new FormData(form)
-    const payload: ContactFormData = {
-      name: String(formData.get('name') ?? '').trim(),
-      email: String(formData.get('email') ?? '').trim(),
-      projectType: String(formData.get('projectType') ?? 'Web').trim(),
-      message: String(formData.get('message') ?? '').trim(),
-    }
+  if (!payload.name) {
+    errors.name = buildRequiredFieldMessage(content.form.name, locale)
+  }
 
-    dispatch({ type: 'SUBMIT', form: payload })
+  if (!payload.email) {
+    errors.email = buildRequiredFieldMessage(content.form.email, locale)
+  } else if (!emailPattern.test(payload.email)) {
+    errors.email = buildInvalidEmailMessage(locale)
+  }
 
-    if (!payload.name || !payload.email || !payload.message) {
-      dispatch({
-        type: 'VALIDATION_FAILED',
-        message: content.status.required,
-      })
-      return
-    }
+  if (!payload.message) {
+    errors.message = buildRequiredFieldMessage(content.form.message, locale)
+  }
 
-    if (!contactFormEndpoint) {
-      dispatch({
-        type: 'VALIDATION_FAILED',
-        message: content.status.missingEndpoint,
-      })
-      return
-    }
+  return errors
+}
 
-    dispatch({
-      type: 'VALIDATION_PASSED',
-      message: content.status.sending,
-    })
+async function sendContactPayload(
+  endpoint: string,
+  payload: ContactFormData,
+  retries = 1,
+  timeoutMs = 12000,
+) {
+  const maxAttempts = retries + 1
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    const controller = new AbortController()
+    const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs)
 
     try {
-      const response = await fetch(contactFormEndpoint, {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -145,12 +101,185 @@ export function useContactForm(content: ContactContent) {
           projectType: payload.projectType,
           source: 'portfolio-web',
         }),
+        signal: controller.signal,
       })
 
-      if (!response.ok) {
+      if (response.ok) return
+      if (attempt === maxAttempts) {
         throw new Error('Contact submit failed')
       }
+    } catch {
+      if (attempt === maxAttempts) {
+        throw new Error('Contact submit failed')
+      }
+    } finally {
+      window.clearTimeout(timeoutId)
+    }
+  }
+}
 
+function transitionContactFormState(
+  state: ContactFormState,
+  event: ContactFormEvent,
+): ContactFormState {
+  switch (event.type) {
+    case 'SUBMIT':
+      return {
+        tag: 'validating',
+        form: event.form,
+        message: '',
+        fieldErrors: {},
+      }
+
+    case 'VALIDATION_PASSED':
+      if (state.tag !== 'validating') return state
+      return {
+        ...state,
+        tag: 'sending',
+        message: event.message,
+      }
+
+    case 'VALIDATION_FAILED':
+      return {
+        ...state,
+        tag: 'error',
+        message: event.message,
+        fieldErrors: event.fieldErrors ?? state.fieldErrors,
+      }
+
+    case 'SEND_SUCCESS':
+      return {
+        tag: 'success',
+        form: null,
+        message: event.message,
+        fieldErrors: {},
+      }
+
+    case 'SEND_FAILED':
+      return {
+        ...state,
+        tag: 'error',
+        message: event.message,
+      }
+
+    case 'CLEAR_FIELD_ERROR': {
+      if (!state.fieldErrors[event.field]) return state
+      const nextFieldErrors = { ...state.fieldErrors }
+      delete nextFieldErrors[event.field]
+      return {
+        ...state,
+        fieldErrors: nextFieldErrors,
+      }
+    }
+
+    case 'RESET':
+      if (state.tag === 'error' || state.tag === 'success') {
+        return {
+          ...state,
+          tag: 'idle',
+          message: '',
+        }
+      }
+      return state
+  }
+}
+
+function getStatusFromState(state: ContactFormState, sendingMessage: string): FormStatus {
+  switch (state.tag) {
+    case 'idle':
+      return { type: 'idle', message: '' }
+    case 'validating':
+      return { type: 'sending', message: sendingMessage }
+    case 'sending':
+      return { type: 'sending', message: state.message || sendingMessage }
+    case 'success':
+      return { type: 'success', message: state.message }
+    case 'error':
+      return { type: 'error', message: state.message }
+  }
+}
+
+const initialState: ContactFormState = {
+  tag: 'idle',
+  form: null,
+  message: '',
+  fieldErrors: {},
+}
+
+export function useContactForm(content: ContactContent, locale: Locale) {
+  const [state, dispatch] = useReducer(transitionContactFormState, initialState)
+  const status = getStatusFromState(state, content.status.sending)
+  const isSubmitting = state.tag === 'validating' || state.tag === 'sending'
+  const contactFormEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim()
+
+  const handleFieldInput = (event: FormEvent<HTMLFormElement>) => {
+    if (isSubmitting) return
+
+    const target = event.target as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement | null
+    if (!target?.name) return
+
+    const fieldName = target.name
+    if (isContactField(fieldName)) {
+      dispatch({ type: 'CLEAR_FIELD_ERROR', field: fieldName })
+    }
+
+    if (state.tag === 'error' || state.tag === 'success') {
+      dispatch({ type: 'RESET' })
+    }
+  }
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (isSubmitting) return
+
+    const form = event.currentTarget
+    const formData = new FormData(form)
+    const payload: ContactFormData = {
+      company: String(formData.get('company') ?? '').trim(),
+      name: String(formData.get('name') ?? '').trim(),
+      email: String(formData.get('email') ?? '').trim(),
+      projectType: String(formData.get('projectType') ?? 'web').trim(),
+      message: String(formData.get('message') ?? '').trim(),
+    }
+
+    dispatch({ type: 'SUBMIT', form: payload })
+    const validationErrors = validateContactPayload(payload, content, locale)
+
+    if (Object.keys(validationErrors).length > 0) {
+      dispatch({
+        type: 'VALIDATION_FAILED',
+        message: content.status.required,
+        fieldErrors: validationErrors,
+      })
+      return
+    }
+
+    if (!contactFormEndpoint) {
+      dispatch({
+        type: 'VALIDATION_FAILED',
+        message: content.status.missingEndpoint,
+        fieldErrors: {},
+      })
+      return
+    }
+
+    // Honeypot anti-spam: if bot fills this field, fake a successful response and skip network.
+    if (payload.company) {
+      dispatch({
+        type: 'SEND_SUCCESS',
+        message: content.status.success,
+      })
+      form.reset()
+      return
+    }
+
+    dispatch({
+      type: 'VALIDATION_PASSED',
+      message: content.status.sending,
+    })
+
+    try {
+      await sendContactPayload(contactFormEndpoint, payload)
       dispatch({
         type: 'SEND_SUCCESS',
         message: content.status.success,
@@ -165,6 +294,8 @@ export function useContactForm(content: ContactContent) {
   }
 
   return {
+    fieldErrors: state.fieldErrors,
+    handleFieldInput,
     handleSubmit,
     isSubmitting,
     status,

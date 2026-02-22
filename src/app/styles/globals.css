@@ -2,17 +2,97 @@
 @import 'tailwindcss';
 
 :root {
+  color-scheme: light;
   --bg-main: #fffdf7;
   --bg-glass: rgb(255 253 247 / 0.86);
+  --surface-1: rgb(255 255 255 / 0.88);
+  --surface-2: rgb(255 255 255 / 0.78);
+  --surface-solid: #ffffff;
+  --input-bg: #ffffff;
   --text-main: #19242f;
   --text-soft: #4a5c70;
   --border-soft: rgb(25 36 47 / 0.14);
   --brand-ink: #0c6b8f;
+  --brand-ink-strong: #095874;
+  --on-brand: #f7fcff;
   --brand-mist: rgb(12 107 143 / 0.26);
   --accent-ink: #bf5a2a;
   --accent-mist: rgb(191 90 42 / 0.2);
+  --secondary-hover-bg: rgb(12 107 143 / 0.1);
+  --status-success: #1f8e59;
+  --status-error: #c53f45;
+  --matrix-field-bg:
+    radial-gradient(circle at 24% 20%, var(--brand-mist) 0%, transparent 40%),
+    linear-gradient(180deg, var(--bg-glass) 0%, var(--bg-main) 100%);
+  --matrix-trail-alpha-multiplier: 1;
+  --rain-opacity-a: 0.58;
+  --rain-opacity-b: 0.3;
   --ascii-rain-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='8' y='18' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E0 1 0 1 : ; . + -%3C/text%3E%3Ctext x='18' y='50' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Eapi data sql etl py rx%3C/text%3E%3Ctext x='34' y='84' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E/%20/%20|%20%5C%20|%20/%20_%20_%3C/text%3E%3Ctext x='10' y='120' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Edocker flask react jwt%3C/text%3E%3Ctext x='28' y='156' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3Ebatch sync io queue api%3C/text%3E%3Ctext x='16' y='194' fill='rgba(12%2C107%2C143%2C0.14)' font-family='monospace' font-size='11'%3E0x01 0x02 0x03 0x04%3C/text%3E%3C/svg%3E");
   --ascii-rain-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Ctext x='20' y='24' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E%23include + return - main%3C/text%3E%3Ctext x='12' y='64' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Eif else while for await%3C/text%3E%3Ctext x='34' y='102' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E001101 101100 010101%3C/text%3E%3Ctext x='18' y='144' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Ejson csv sql api queue%3C/text%3E%3Ctext x='28' y='186' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3Etrace log event stream%3C/text%3E%3Ctext x='14' y='230' fill='rgba(191%2C90%2C42%2C0.12)' font-family='monospace' font-size='10'%3E/%20|%20%5C%20_%20-%20+%20:%20;%3C/text%3E%3C/svg%3E");
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-main: #0b121a;
+  --bg-glass: rgb(11 18 26 / 0.84);
+  --surface-1: rgb(20 31 45 / 0.88);
+  --surface-2: rgb(16 25 37 / 0.94);
+  --surface-solid: #172435;
+  --input-bg: #0f1a28;
+  --text-main: #e7f0fa;
+  --text-soft: #b7c7d9;
+  --border-soft: rgb(167 191 216 / 0.28);
+  --brand-ink: #5bc2e8;
+  --brand-ink-strong: #3bb1dc;
+  --on-brand: #04121b;
+  --brand-mist: rgb(91 194 232 / 0.26);
+  --accent-ink: #f39a65;
+  --accent-mist: rgb(243 154 101 / 0.24);
+  --secondary-hover-bg: rgb(91 194 232 / 0.18);
+  --status-success: #55d49b;
+  --status-error: #ff8f97;
+  --matrix-field-bg:
+    radial-gradient(circle at 20% 18%, rgb(91 194 232 / 0.2) 0%, transparent 38%),
+    radial-gradient(circle at 78% 82%, rgb(243 154 101 / 0.14) 0%, transparent 44%),
+    linear-gradient(180deg, rgb(12 20 31 / 0.92) 0%, var(--bg-main) 100%);
+  --matrix-trail-alpha-multiplier: 0.86;
+  --rain-opacity-a: 0.34;
+  --rain-opacity-b: 0.22;
+  --ascii-rain-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='8' y='18' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E0 1 0 1 : ; . + -%3C/text%3E%3Ctext x='18' y='50' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Eapi data sql etl py rx%3C/text%3E%3Ctext x='34' y='84' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E/%20/%20|%20%5C%20|%20/%20_%20_%3C/text%3E%3Ctext x='10' y='120' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Edocker flask react jwt%3C/text%3E%3Ctext x='28' y='156' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Ebatch sync io queue api%3C/text%3E%3Ctext x='16' y='194' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E0x01 0x02 0x03 0x04%3C/text%3E%3C/svg%3E");
+  --ascii-rain-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Ctext x='20' y='24' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E%23include + return - main%3C/text%3E%3Ctext x='12' y='64' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Eif else while for await%3C/text%3E%3Ctext x='34' y='102' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E001101 101100 010101%3C/text%3E%3Ctext x='18' y='144' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Ejson csv sql api queue%3C/text%3E%3Ctext x='28' y='186' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Etrace log event stream%3C/text%3E%3Ctext x='14' y='230' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E/%20|%20%5C%20_%20-%20+%20:%20;%3C/text%3E%3C/svg%3E");
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg-main: #0b121a;
+    --bg-glass: rgb(11 18 26 / 0.84);
+    --surface-1: rgb(20 31 45 / 0.88);
+    --surface-2: rgb(16 25 37 / 0.94);
+    --surface-solid: #172435;
+    --input-bg: #0f1a28;
+    --text-main: #e7f0fa;
+    --text-soft: #b7c7d9;
+    --border-soft: rgb(167 191 216 / 0.28);
+    --brand-ink: #5bc2e8;
+    --brand-ink-strong: #3bb1dc;
+    --on-brand: #04121b;
+    --brand-mist: rgb(91 194 232 / 0.26);
+    --accent-ink: #f39a65;
+    --accent-mist: rgb(243 154 101 / 0.24);
+    --secondary-hover-bg: rgb(91 194 232 / 0.18);
+    --status-success: #55d49b;
+    --status-error: #ff8f97;
+    --matrix-field-bg:
+      radial-gradient(circle at 20% 18%, rgb(91 194 232 / 0.2) 0%, transparent 38%),
+      radial-gradient(circle at 78% 82%, rgb(243 154 101 / 0.14) 0%, transparent 44%),
+      linear-gradient(180deg, rgb(12 20 31 / 0.92) 0%, var(--bg-main) 100%);
+    --matrix-trail-alpha-multiplier: 0.86;
+    --rain-opacity-a: 0.34;
+    --rain-opacity-b: 0.22;
+    --ascii-rain-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Ctext x='8' y='18' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E0 1 0 1 : ; . + -%3C/text%3E%3Ctext x='18' y='50' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Eapi data sql etl py rx%3C/text%3E%3Ctext x='34' y='84' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E/%20/%20|%20%5C%20|%20/%20_%20_%3C/text%3E%3Ctext x='10' y='120' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Edocker flask react jwt%3C/text%3E%3Ctext x='28' y='156' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3Ebatch sync io queue api%3C/text%3E%3Ctext x='16' y='194' fill='rgba(91%2C194%2C232%2C0.18)' font-family='monospace' font-size='11'%3E0x01 0x02 0x03 0x04%3C/text%3E%3C/svg%3E");
+    --ascii-rain-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='260' height='260' viewBox='0 0 260 260'%3E%3Ctext x='20' y='24' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E%23include + return - main%3C/text%3E%3Ctext x='12' y='64' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Eif else while for await%3C/text%3E%3Ctext x='34' y='102' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E001101 101100 010101%3C/text%3E%3Ctext x='18' y='144' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Ejson csv sql api queue%3C/text%3E%3Ctext x='28' y='186' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3Etrace log event stream%3C/text%3E%3Ctext x='14' y='230' fill='rgba(243%2C154%2C101%2C0.16)' font-family='monospace' font-size='10'%3E/%20|%20%5C%20_%20-%20+%20:%20;%3C/text%3E%3C/svg%3E");
+  }
 }
 
 *,
@@ -57,7 +137,7 @@ body::before {
   background-size:
     220px 220px,
     260px 260px;
-  opacity: 0.58;
+  opacity: var(--rain-opacity-a);
   animation: ascii-rain-fall 24s linear infinite;
 }
 
@@ -66,7 +146,7 @@ body::after {
   background-position: 70px -140px;
   background-repeat: repeat;
   background-size: 280px 280px;
-  opacity: 0.3;
+  opacity: var(--rain-opacity-b);
   filter: blur(0.3px);
   animation: ascii-rain-drift 32s linear infinite;
 }

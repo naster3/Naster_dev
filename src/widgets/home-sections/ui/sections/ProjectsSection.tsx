@@ -1,14 +1,106 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { ArrowUpRight, ExternalLink, Github } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { portfolioLinks, useI18n } from '@/shared'
 import { cn } from '@/shared/lib'
 import { homeContentByLocale, motionViewport, sectionReveal, stagger } from '../../model'
 import { primaryBtnClass, secondaryBtnClass } from '../styles'
 
+type ProjectFilter = 'all' | 'backend' | 'frontend'
+
+const backendSignals = [
+  'backend',
+  'api',
+  'data',
+  'sql',
+  'python',
+  'flask',
+  'fastapi',
+  'sqlalchemy',
+  'postgres',
+  'jwt',
+  'etl',
+  'dw',
+]
+
+const frontendSignals = [
+  'frontend',
+  'react',
+  'tailwind',
+  'typescript',
+  'chrome extension',
+  'ui',
+  'vite',
+  'css',
+  'web',
+]
+
+function normalizeFilterText(value: string) {
+  return value
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+}
+
+function resolveProjectTrack(project: {
+  stack: string[]
+  tag: string
+}): Exclude<ProjectFilter, 'all'> {
+  const tag = normalizeFilterText(project.tag)
+  const stackText = normalizeFilterText(project.stack.join(' '))
+  const sourceText = `${tag} ${stackText}`
+
+  const frontendTagSignals = ['frontend', 'productividad', 'productivity', 'ui', 'extension']
+  const backendTagSignals = ['backend', 'data', 'api']
+
+  if (frontendTagSignals.some((signal) => tag.includes(signal))) return 'frontend'
+  if (backendTagSignals.some((signal) => tag.includes(signal))) return 'backend'
+
+  const backendScore = backendSignals.reduce(
+    (score, signal) => score + (sourceText.includes(signal) ? 1 : 0),
+    0,
+  )
+  const frontendScore = frontendSignals.reduce(
+    (score, signal) => score + (sourceText.includes(signal) ? 1 : 0),
+    0,
+  )
+
+  if (backendScore === frontendScore) {
+    const hasFrontendCore = ['react', 'typescript', 'tailwind', 'ui'].some((signal) =>
+      stackText.includes(signal),
+    )
+    return hasFrontendCore ? 'frontend' : 'backend'
+  }
+
+  return backendScore > frontendScore ? 'backend' : 'frontend'
+}
+
 export function ProjectsSection() {
   const { locale } = useI18n()
   const content = homeContentByLocale[locale]
+  const [activeFilter, setActiveFilter] = useState<ProjectFilter>('all')
+  const filterOptions =
+    locale === 'es'
+      ? [
+          { key: 'all' as const, label: 'Todos' },
+          { key: 'backend' as const, label: 'Backend' },
+          { key: 'frontend' as const, label: 'Frontend' },
+        ]
+      : [
+          { key: 'all' as const, label: 'All' },
+          { key: 'backend' as const, label: 'Backend' },
+          { key: 'frontend' as const, label: 'Frontend' },
+        ]
+  const emptyFilterLabel =
+    locale === 'es'
+      ? 'No hay proyectos en esta categoría todavía.'
+      : 'No projects in this category yet.'
+
+  const filteredProjects = useMemo(() => {
+    if (activeFilter === 'all') return content.projects
+    return content.projects.filter((project) => resolveProjectTrack(project) === activeFilter)
+  }, [activeFilter, content.projects])
 
   return (
     <section id="proyectos" className="space-y-10">
@@ -24,8 +116,28 @@ export function ProjectsSection() {
             {content.projectsSection.title}
           </h2>
           <p className="mt-3 max-w-2xl text-(--text-soft)">{content.projectsSection.subtitle}</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {filterOptions.map((option) => {
+              const isActive = option.key === activeFilter
+              return (
+                <button
+                  key={option.key}
+                  type="button"
+                  aria-pressed={isActive}
+                  onClick={() => setActiveFilter(option.key)}
+                  className={cn(
+                    secondaryBtnClass,
+                    'px-4 py-2 text-xs',
+                    isActive ? 'border-(--brand-ink) bg-(--brand-mist) text-(--brand-ink)' : '',
+                  )}
+                >
+                  {option.label}
+                </button>
+              )
+            })}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-3 md:col-span-4 md:justify-end">
+        <div className="flex flex-wrap items-center gap-3 md:col-span-4 md:justify-end">
           <a
             href={portfolioLinks.github}
             target="_blank"
@@ -46,13 +158,13 @@ export function ProjectsSection() {
       </motion.div>
 
       <motion.div
+        key={`${locale}-${activeFilter}`}
         variants={stagger}
         initial="hidden"
-        whileInView="show"
-        viewport={motionViewport.list}
+        animate="show"
         className="space-y-8"
       >
-        {content.projects.map((project) => {
+        {filteredProjects.map((project) => {
           const demoUrl = project.links?.demo ?? portfolioLinks.github
           const repoUrl = project.links?.repo ?? portfolioLinks.github
           const docsUrl = project.links?.docs ?? portfolioLinks.docs
@@ -63,7 +175,7 @@ export function ProjectsSection() {
             <motion.article
               key={project.title}
               variants={sectionReveal}
-              className="rounded-[1.45rem] border border-(--border-soft) bg-white/80 p-6 shadow-[0_10px_36px_-26px_rgb(25_36_47/0.8)]"
+              className="rounded-[1.45rem] border border-(--border-soft) bg-(--surface-1) p-6 shadow-[0_10px_36px_-26px_rgb(25_36_47/0.8)]"
             >
               <div className="mb-5 flex flex-wrap items-center gap-3">
                 <h3 className="text-2xl font-semibold text-(--text-main)">{project.title}</h3>
@@ -74,7 +186,7 @@ export function ProjectsSection() {
 
               <div className="grid gap-6 md:grid-cols-12">
                 <div className="space-y-4 md:col-span-5">
-                  <div className="relative aspect-16/10 overflow-hidden rounded-2xl border border-(--border-soft) bg-[linear-gradient(130deg,#fdfefe_15%,#e9f4fb_60%,#fbefe9_100%)]">
+                  <div className="relative aspect-16/10 overflow-hidden rounded-2xl border border-(--border-soft) bg-[linear-gradient(130deg,var(--surface-solid)_15%,var(--surface-1)_60%,var(--surface-2)_100%)]">
                     {project.coverImage ? (
                       <>
                         <img
@@ -166,6 +278,15 @@ export function ProjectsSection() {
             </motion.article>
           )
         })}
+
+        {filteredProjects.length === 0 ? (
+          <motion.p
+            variants={sectionReveal}
+            className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-5 text-center text-sm text-(--text-soft)"
+          >
+            {emptyFilterLabel}
+          </motion.p>
+        ) : null}
       </motion.div>
 
       <motion.div

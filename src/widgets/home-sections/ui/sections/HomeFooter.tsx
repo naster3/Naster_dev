@@ -24,7 +24,7 @@ export function HomeFooter() {
         {content.footer.evidence.map((item) => (
           <li
             key={item}
-            className="inline-flex items-center gap-1 rounded-full border border-(--border-soft) bg-white/90 px-3 py-1 text-xs text-(--text-main)"
+            className="inline-flex items-center gap-1 rounded-full border border-(--border-soft) bg-(--surface-1) px-3 py-1 text-xs text-(--text-main)"
           >
             <Clock3 size={12} className="text-(--accent-ink)" />
             {item}

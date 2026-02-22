@@ -19,9 +19,9 @@ export function BootLoader({ progress, transitionProgress }: BootLoaderProps) {
       initial={{ opacity: 1 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, transition: { duration: 0.25, ease: [0.22, 1, 0.36, 1] } }}
-      className="fixed inset-0 z-120 grid place-items-center overflow-hidden bg-[color:var(--bg-main)]"
+      className="fixed inset-0 z-120 grid place-items-center overflow-hidden bg-(--bg-main)"
     >
-      <div className="grid h-full w-full place-items-center [perspective:1300px]">
+      <div className="grid h-full w-full place-items-center perspective-[1300px]">
         <motion.div
           initial={{ opacity: 0, scale: 1.38, y: 26, z: 320, filter: 'blur(12px)' }}
           animate={{
@@ -35,7 +35,7 @@ export function BootLoader({ progress, transitionProgress }: BootLoaderProps) {
             filter: `blur(${4 * eased}px)`,
           }}
           transition={{ duration: 0.08, ease: 'linear' }}
-          className="relative [transform-style:preserve-3d]"
+          className="relative transform-3d"
         >
           {depthLayers.map((layer) => (
             <p

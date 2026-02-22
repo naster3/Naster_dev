@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+﻿import { motion } from 'framer-motion'
 import { BadgeCheck, CalendarClock, Clock3, Wrench } from 'lucide-react'
 import { useI18n } from '@/shared'
 import { cn } from '@/shared/lib'
@@ -71,7 +71,7 @@ export function QuickEvidenceSection() {
               key={card.key}
               variants={sectionReveal}
               className={cn(
-                'relative overflow-hidden rounded-3xl border border-(--border-soft) bg-white/88 p-6',
+                'relative overflow-hidden rounded-3xl border border-(--border-soft) bg-(--surface-1) p-6',
                 cardGridClassByKey[card.key],
               )}
             >
@@ -114,7 +114,7 @@ export function QuickEvidenceSection() {
 
         <motion.article
           variants={sectionReveal}
-          className="rounded-3xl border border-(--border-soft) bg-white/84 p-6 md:col-span-12 lg:col-span-4"
+          className="rounded-3xl border border-(--border-soft) bg-(--surface-1) p-6 md:col-span-12 lg:col-span-4"
         >
           <div className="flex items-center gap-2">
             <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-(--border-soft) bg-(--brand-mist)">
@@ -128,7 +128,7 @@ export function QuickEvidenceSection() {
             {skills.toolbox.items.map((item) => (
               <span
                 key={item}
-                className="rounded-full border border-(--border-soft) bg-white px-3 py-1 text-xs font-medium text-(--text-main)"
+                className="rounded-full border border-(--border-soft) bg-(--surface-solid) px-3 py-1 text-xs font-medium text-(--text-main)"
               >
                 {item}
               </span>
@@ -142,7 +142,7 @@ export function QuickEvidenceSection() {
         initial="hidden"
         whileInView="show"
         viewport={motionViewport.standard}
-        className="space-y-4 rounded-3xl border border-(--border-soft) bg-[linear-gradient(145deg,#ffffff_30%,#f7fbff_100%)] p-5"
+        className="space-y-4 rounded-3xl border border-(--border-soft) bg-[linear-gradient(145deg,var(--surface-solid)_30%,var(--surface-1)_100%)] p-5"
       >
         <header>
           <h3 className="text-lg font-semibold text-(--text-main)">{skills.work.title}</h3>
@@ -156,7 +156,7 @@ export function QuickEvidenceSection() {
               <motion.article
                 key={item.title}
                 variants={sectionReveal}
-                className="rounded-2xl border border-(--border-soft) bg-white/88 p-4"
+                className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-4"
               >
                 <div className="flex items-center gap-2">
                   <Icon size={16} className="text-(--brand-ink)" />
@@ -193,7 +193,7 @@ export function QuickEvidenceSection() {
             <motion.article
               key={value.key}
               variants={valueCardReveal}
-              className="space-y-4 rounded-2xl border border-(--border-soft) bg-white/90 p-5"
+              className="space-y-4 rounded-2xl border border-(--border-soft) bg-(--surface-1) p-5"
             >
               <div className="flex items-center justify-between">
                 <span className="rounded-full bg-(--brand-mist) px-2.5 py-1 text-[11px] font-semibold tracking-[0.08em] text-(--brand-ink)">

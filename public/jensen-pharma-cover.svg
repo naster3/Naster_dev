@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 760" role="img" aria-labelledby="title desc">
+  <title id="title">Jensen Pharmaceutical - Frontend Cover</title>
+  <desc id="desc">Abstract frontend cover with soft medical-tech style</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8f7ff" />
+      <stop offset="60%" stop-color="#f5fbff" />
+      <stop offset="100%" stop-color="#eef2ff" />
+    </linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#0c6b8f" />
+      <stop offset="100%" stop-color="#24628f" />
+    </linearGradient>
+    <radialGradient id="glowA" cx="20%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#7ccbe8" stop-opacity="0.45" />
+      <stop offset="100%" stop-color="#7ccbe8" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="glowB" cx="80%" cy="85%" r="65%">
+      <stop offset="0%" stop-color="#bf5a2a" stop-opacity="0.22" />
+      <stop offset="100%" stop-color="#bf5a2a" stop-opacity="0" />
+    </radialGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M40 0H0V40" fill="none" stroke="#0c6b8f" stroke-opacity="0.08" />
+    </pattern>
+  </defs>
+
+  <rect width="1200" height="760" fill="url(#bg)" />
+  <rect width="1200" height="760" fill="url(#glowA)" />
+  <rect width="1200" height="760" fill="url(#glowB)" />
+  <rect width="1200" height="760" fill="url(#grid)" />
+
+  <g opacity="0.16" fill="none" stroke="#0c6b8f">
+    <circle cx="190" cy="640" r="120" />
+    <circle cx="980" cy="170" r="160" />
+    <circle cx="1120" cy="640" r="64" />
+  </g>
+
+  <g transform="translate(110 120)">
+    <rect x="0" y="0" width="980" height="520" rx="34" fill="#ffffff" fill-opacity="0.58" stroke="#0c6b8f" stroke-opacity="0.2" />
+
+    <text x="72" y="126" font-family="'Space Grotesk', Arial, sans-serif" font-size="40" font-weight="700" fill="url(#ink)">
+      Jensen Pharmaceutical
+    </text>
+    <text x="72" y="176" font-family="'Space Grotesk', Arial, sans-serif" font-size="24" fill="#2f526b">
+      Frontend Case Study
+    </text>
+
+    <g transform="translate(72 228)">
+      <rect width="320" height="210" rx="18" fill="#f8fcff" stroke="#0c6b8f" stroke-opacity="0.2" />
+      <rect x="20" y="24" width="180" height="20" rx="10" fill="#0c6b8f" fill-opacity="0.15" />
+      <rect x="20" y="58" width="272" height="14" rx="7" fill="#0c6b8f" fill-opacity="0.1" />
+      <rect x="20" y="84" width="236" height="14" rx="7" fill="#0c6b8f" fill-opacity="0.1" />
+      <rect x="20" y="118" width="132" height="52" rx="12" fill="#0c6b8f" fill-opacity="0.18" />
+      <rect x="166" y="118" width="126" height="52" rx="12" fill="#bf5a2a" fill-opacity="0.16" />
+    </g>
+
+    <g transform="translate(430 228)">
+      <rect width="476" height="96" rx="18" fill="#f8fcff" stroke="#0c6b8f" stroke-opacity="0.2" />
+      <text x="26" y="40" font-family="'Space Grotesk', Arial, sans-serif" font-size="20" font-weight="600" fill="#174766">
+        UX + Content Hierarchy
+      </text>
+      <text x="26" y="70" font-family="'Space Grotesk', Arial, sans-serif" font-size="16" fill="#40627d">
+        Clear sections, trust-focused messaging, direct contact flow.
+      </text>
+    </g>
+
+    <g transform="translate(430 340)">
+      <rect width="476" height="98" rx="18" fill="#f8fcff" stroke="#0c6b8f" stroke-opacity="0.2" />
+      <text x="26" y="40" font-family="'Space Grotesk', Arial, sans-serif" font-size="20" font-weight="600" fill="#174766">
+        Stack
+      </text>
+      <text x="26" y="70" font-family="'Space Grotesk', Arial, sans-serif" font-size="16" fill="#40627d">
+        React • TypeScript • Tailwind CSS • Responsive UI
+      </text>
+    </g>
+  </g>
+</svg>

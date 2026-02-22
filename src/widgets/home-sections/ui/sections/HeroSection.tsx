@@ -148,17 +148,17 @@ export function HeroSection() {
         </motion.div>
 
         <motion.div variants={sectionReveal} className="space-y-5 md:col-span-5">
-          <div className="relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-[2.2rem] border border-(--border-soft) bg-[linear-gradient(155deg,#ffffff_10%,#f6fbff_48%,#f3f8fc_100%)]">
+          <div className="relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-[2.2rem] border border-(--border-soft) bg-[linear-gradient(155deg,var(--surface-solid)_10%,var(--surface-1)_48%,var(--surface-2)_100%)]">
             <img
-              src="/image.png"
+              src="/imageperfil.png"
               alt={content.hero.avatarLabel}
               loading="eager"
               decoding="async"
               className="h-full w-full object-cover"
             />
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,rgb(255_255_255_/_0.28),transparent_45%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,var(--brand-mist),transparent_45%)]" />
           </div>
-          <div className="rounded-2xl border border-(--border-soft) bg-white/80 p-4">
+          <div className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-4">
             <p className="text-sm font-semibold text-(--text-main)">
               {typedName}
               <motion.span

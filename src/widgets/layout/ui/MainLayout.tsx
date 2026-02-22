@@ -66,7 +66,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         variants={headerReveal}
         initial="hidden"
         animate="show"
-        className="group/header sticky top-0 z-50 border-b border-(--border-soft) bg-(--bg-glass) backdrop-blur-xl transition-[background-color,box-shadow] duration-300 hover:bg-white/95 hover:shadow-[0_12px_30px_-24px_rgb(25_36_47/0.65)]"
+        className="group/header sticky top-0 z-50 border-b border-(--border-soft) bg-(--bg-glass) backdrop-blur-xl transition-[background-color,box-shadow] duration-300 hover:bg-(--surface-1) hover:shadow-[0_12px_30px_-24px_rgb(25_36_47/0.65)]"
       >
         <div className="mx-auto flex h-18 w-full max-w-300 items-center justify-between px-4 md:px-6">
           <Link
@@ -77,7 +77,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               whileHover={{ scale: 1.06, rotate: -8 }}
               whileTap={{ scale: 0.95 }}
               transition={{ type: 'spring', stiffness: 340, damping: 24 }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--border-soft) bg-white p-1"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-(--border-soft) bg-(--surface-solid) p-1"
             >
               <img
                 src="/rocket_icon_pack/rocket_32x32.png"
@@ -101,7 +101,7 @@ export function MainLayout({ children }: MainLayoutProps) {
             variants={navReveal}
             initial="hidden"
             animate="show"
-            className="hidden items-center gap-1 rounded-full border border-(--border-soft) bg-white/70 p-1 transition-[border-color,box-shadow] duration-200 group-hover/header:border-(--brand-mist) group-hover/header:shadow-[0_10px_28px_-24px_rgb(25_36_47/0.72)] md:flex"
+            className="hidden items-center gap-1 rounded-full border border-(--border-soft) bg-(--surface-2) p-1 transition-[border-color,box-shadow] duration-200 group-hover/header:border-(--brand-mist) group-hover/header:shadow-[0_10px_28px_-24px_rgb(25_36_47/0.72)] md:flex"
           >
             {sectionLinks.map((item) => (
               <motion.div key={item.to} variants={navItemReveal} whileHover={{ y: -1 }}>
@@ -138,7 +138,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               onClick={() => setIsMobileMenuOpen((prev) => !prev)}
               whileHover={{ y: -1 }}
               whileTap={{ scale: 0.92 }}
-              className="rounded-full border border-(--border-soft) bg-white p-2 text-(--text-main) transition-[background-color,border-color] hover:border-(--brand-mist) hover:bg-(--brand-mist)"
+              className="rounded-full border border-(--border-soft) bg-(--surface-solid) p-2 text-(--text-main) transition-[background-color,border-color] hover:border-(--brand-mist) hover:bg-(--secondary-hover-bg)"
             >
               <motion.span
                 animate={{ rotate: isMobileMenuOpen ? 90 : 0, scale: isMobileMenuOpen ? 1.06 : 1 }}
@@ -159,7 +159,7 @@ export function MainLayout({ children }: MainLayoutProps) {
               animate="open"
               exit="closed"
               transition={{ duration: 0.14 }}
-              className="origin-top border-t border-(--border-soft) bg-white px-4 py-3 md:hidden"
+              className="origin-top border-t border-(--border-soft) bg-(--surface-solid) px-4 py-3 md:hidden"
             >
               <motion.nav
                 variants={navReveal}

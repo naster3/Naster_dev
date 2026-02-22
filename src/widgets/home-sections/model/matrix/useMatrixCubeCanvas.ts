@@ -73,25 +73,65 @@ export function useMatrixCubeCanvas(
       targetFps,
       trailAlpha,
     } = getMatrixCubeConfig(runtime.qualityTier)
+    let palette = (() => {
+      const rootStyles = getComputedStyle(document.documentElement)
+      const backgroundCss = rootStyles.getPropertyValue('--bg-main').trim() || '#fffdf7'
+      const trailMultiplierCss = Number(
+        rootStyles.getPropertyValue('--matrix-trail-alpha-multiplier').trim(),
+      )
 
-    const rootStyles = getComputedStyle(document.documentElement)
-    const backgroundCss = rootStyles.getPropertyValue('--bg-main').trim() || '#fffdf7'
-    const backgroundRgb = parseCssColorToRgb(backgroundCss, { r: 255, g: 253, b: 247 })
-    const brandRgb = parseCssColorToRgb(rootStyles.getPropertyValue('--brand-ink'), {
-      r: 12,
-      g: 107,
-      b: 143,
-    })
-    const textMainRgb = parseCssColorToRgb(rootStyles.getPropertyValue('--text-main'), {
-      r: 25,
-      g: 36,
-      b: 47,
-    })
-    const accentRgb = parseCssColorToRgb(rootStyles.getPropertyValue('--accent-ink'), {
-      r: 191,
-      g: 90,
-      b: 42,
-    })
+      return {
+        accentRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--accent-ink'), {
+          r: 191,
+          g: 90,
+          b: 42,
+        }),
+        backgroundCss,
+        backgroundRgb: parseCssColorToRgb(backgroundCss, { r: 255, g: 253, b: 247 }),
+        brandRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--brand-ink'), {
+          r: 12,
+          g: 107,
+          b: 143,
+        }),
+        textMainRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--text-main'), {
+          r: 25,
+          g: 36,
+          b: 47,
+        }),
+        trailMultiplier:
+          Number.isFinite(trailMultiplierCss) && trailMultiplierCss > 0 ? trailMultiplierCss : 1,
+      }
+    })()
+
+    const refreshPalette = () => {
+      const rootStyles = getComputedStyle(document.documentElement)
+      const backgroundCss = rootStyles.getPropertyValue('--bg-main').trim() || '#fffdf7'
+      const trailMultiplierCss = Number(
+        rootStyles.getPropertyValue('--matrix-trail-alpha-multiplier').trim(),
+      )
+
+      palette = {
+        accentRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--accent-ink'), {
+          r: 191,
+          g: 90,
+          b: 42,
+        }),
+        backgroundCss,
+        backgroundRgb: parseCssColorToRgb(backgroundCss, { r: 255, g: 253, b: 247 }),
+        brandRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--brand-ink'), {
+          r: 12,
+          g: 107,
+          b: 143,
+        }),
+        textMainRgb: parseCssColorToRgb(rootStyles.getPropertyValue('--text-main'), {
+          r: 25,
+          g: 36,
+          b: 47,
+        }),
+        trailMultiplier:
+          Number.isFinite(trailMultiplierCss) && trailMultiplierCss > 0 ? trailMultiplierCss : 1,
+      }
+    }
 
     const cubeVertices = createCubeVertices(cubeSize)
 
@@ -136,7 +176,7 @@ export function useMatrixCubeCanvas(
       maskCtx.imageSmoothingEnabled = false
 
       initRain()
-      ctx.fillStyle = backgroundCss
+      ctx.fillStyle = palette.backgroundCss
       ctx.fillRect(0, 0, width, height)
     }
 
@@ -146,7 +186,11 @@ export function useMatrixCubeCanvas(
       time += 0.015 * deltaRatio
 
       // Limpia con alpha bajo para conservar estela sin reinicio visual brusco.
-      ctx.fillStyle = rgba(backgroundRgb, trailAlpha)
+      const effectiveTrailAlpha = Math.max(
+        0.06,
+        Math.min(0.92, trailAlpha * palette.trailMultiplier),
+      )
+      ctx.fillStyle = rgba(palette.backgroundRgb, effectiveTrailAlpha)
       ctx.fillRect(0, 0, width, height)
 
       const cube = getCubeStateAt()
@@ -158,8 +202,8 @@ export function useMatrixCubeCanvas(
 
       if (showFaceRain) {
         drawFaceRain({
-          accentRgb,
-          brandRgb,
+          accentRgb: palette.accentRgb,
+          brandRgb: palette.brandRgb,
           charset,
           ctx,
           dpr,
@@ -177,7 +221,7 @@ export function useMatrixCubeCanvas(
           frontFaceIndices,
           height,
           maskCtx,
-          textMainRgb,
+          textMainRgb: palette.textMainRgb,
           time,
           width,
           zNorm,
@@ -186,7 +230,7 @@ export function useMatrixCubeCanvas(
 
       if (renderCube && !showWireframe) {
         drawFrontFaceOutlines({
-          brandRgb,
+          brandRgb: palette.brandRgb,
           ctx,
           facePolys: cube.facePolys,
           frontFaceIndices,
@@ -194,8 +238,8 @@ export function useMatrixCubeCanvas(
       }
 
       drawMatrixRainColumns({
-        accentRgb,
-        brandRgb,
+        accentRgb: palette.accentRgb,
+        brandRgb: palette.brandRgb,
         charset,
         columns,
         ctx,
@@ -207,13 +251,13 @@ export function useMatrixCubeCanvas(
         height,
         showFaceRain,
         speeds,
-        textMainRgb,
+        textMainRgb: palette.textMainRgb,
         time,
       })
 
       if (renderCube && showWireframe) {
         drawCubeWireframe({
-          brandRgb,
+          brandRgb: palette.brandRgb,
           ctx,
           getCubeStateAt,
           projected: cube.projected,
@@ -259,6 +303,20 @@ export function useMatrixCubeCanvas(
     resize()
     const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(canvas)
+    const themeObserver = new MutationObserver(() => {
+      refreshPalette()
+      if (!isLoopRunning) draw(1)
+    })
+    themeObserver.observe(document.documentElement, {
+      attributeFilter: ['class', 'data-theme', 'style'],
+      attributes: true,
+    })
+    const colorSchemeMedia = window.matchMedia('(prefers-color-scheme: dark)')
+    const onColorSchemeChange = () => {
+      refreshPalette()
+      if (!isLoopRunning) draw(1)
+    }
+    colorSchemeMedia.addEventListener('change', onColorSchemeChange)
 
     // Expone controles imperativos para cambios de actividad y reduced-motion.
     controlsRef.current = { renderStatic, start, stop }
@@ -275,6 +333,8 @@ export function useMatrixCubeCanvas(
       controlsRef.current = null
       stop()
       resizeObserver.disconnect()
+      themeObserver.disconnect()
+      colorSchemeMedia.removeEventListener('change', onColorSchemeChange)
     }
   }, [canvasRef, runtime.qualityTier])
 

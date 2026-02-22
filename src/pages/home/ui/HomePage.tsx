@@ -8,6 +8,7 @@ import {
   MatrixCubeSection,
   ProjectsSection,
   QuickEvidenceSection,
+  ScrollIndicator,
 } from '@/widgets/home-sections'
 
 export function HomePage() {
@@ -30,6 +31,11 @@ export function HomePage() {
         <ProjectsSection />
         <ContactSection />
       </main>
+
+      <ScrollIndicator
+        targetId="sobre-mi"
+        className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2 backdrop-blur-[2px]"
+      />
 
       <HomeFooter />
     </>

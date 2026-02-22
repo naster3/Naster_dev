@@ -49,7 +49,8 @@ export function MatrixCubeSection() {
     >
       <div
         ref={containerRef}
-        className="relative h-[70svh] min-h-120 w-full overflow-hidden bg-[radial-gradient(circle_at_24%_20%,var(--brand-mist)_0%,transparent_40%),linear-gradient(180deg,var(--bg-glass)_0%,var(--bg-main)_100%)]"
+        className="relative h-[70svh] min-h-120 w-full overflow-hidden"
+        style={{ backgroundImage: 'var(--matrix-field-bg)' }}
       >
         <canvas
           ref={canvasRef}

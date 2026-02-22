@@ -42,6 +42,7 @@ describe('I18nProvider', () => {
     )
 
     expect(screen.getByText('en::View Resume')).toBeInTheDocument()
+    expect(document.documentElement.lang).toBe('en')
   })
 
   it('hace fallback a espanol para idiomas no soportados', () => {
@@ -61,5 +62,6 @@ describe('I18nProvider', () => {
     )
 
     expect(screen.getByText('es::Ver CV')).toBeInTheDocument()
+    expect(document.documentElement.lang).toBe('es')
   })
 })
