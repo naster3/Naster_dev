@@ -36,6 +36,24 @@ const frontendSignals = [
   'web',
 ]
 
+const responsiveCoverImages: Record<
+  string,
+  {
+    height: number
+    sizes: string
+    srcSet: string
+    width: number
+  }
+> = {
+  '/FocusTube_Blocker_portfolio_cover_iconsDecor.png': {
+    height: 900,
+    sizes: '(min-width: 768px) 493px, 92vw',
+    srcSet:
+      '/FocusTube_Blocker_portfolio_cover_iconsDecor-640.webp 640w, /FocusTube_Blocker_portfolio_cover_iconsDecor-960.webp 960w',
+    width: 1600,
+  },
+}
+
 function normalizeFilterText(value: string) {
   return value
     .toLowerCase()
@@ -170,6 +188,9 @@ export function ProjectsSection() {
           const docsUrl = project.links?.docs ?? portfolioLinks.docs
           const demoLabel = project.demoLabel ?? content.projectsSection.linkLabels.demo
           const showRepoButton = repoUrl !== demoUrl || !project.demoLabel
+          const responsiveCover = project.coverImage
+            ? responsiveCoverImages[project.coverImage]
+            : undefined
 
           return (
             <motion.article
@@ -189,13 +210,33 @@ export function ProjectsSection() {
                   <div className="relative aspect-16/10 overflow-hidden rounded-2xl border border-(--border-soft) bg-[linear-gradient(130deg,var(--surface-solid)_15%,var(--surface-1)_60%,var(--surface-2)_100%)]">
                     {project.coverImage ? (
                       <>
-                        <img
-                          src={project.coverImage}
-                          alt={project.title}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover"
-                        />
+                        {responsiveCover ? (
+                          <picture className="h-full w-full">
+                            <source
+                              type="image/webp"
+                              srcSet={responsiveCover.srcSet}
+                              sizes={responsiveCover.sizes}
+                            />
+                            <img
+                              src={project.coverImage}
+                              alt={project.title}
+                              loading="lazy"
+                              decoding="async"
+                              width={responsiveCover.width}
+                              height={responsiveCover.height}
+                              sizes={responsiveCover.sizes}
+                              className="h-full w-full object-cover"
+                            />
+                          </picture>
+                        ) : (
+                          <img
+                            src={project.coverImage}
+                            alt={project.title}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-[linear-gradient(180deg,transparent_48%,rgb(25_36_47/0.22)_100%)]" />
                       </>
                     ) : (

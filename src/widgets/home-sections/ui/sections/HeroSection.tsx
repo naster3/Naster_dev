@@ -149,13 +149,24 @@ export function HeroSection() {
 
         <motion.div variants={sectionReveal} className="space-y-5 md:col-span-5">
           <div className="relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-[2.2rem] border border-(--border-soft) bg-[linear-gradient(155deg,var(--surface-solid)_10%,var(--surface-1)_48%,var(--surface-2)_100%)]">
-            <img
-              src="/imageperfil.png"
-              alt={content.hero.avatarLabel}
-              loading="eager"
-              decoding="async"
-              className="h-full w-full object-cover"
-            />
+            <picture className="h-full w-full">
+              <source
+                type="image/webp"
+                srcSet="/imageperfil-384.webp 384w, /imageperfil-768.webp 768w"
+                sizes="(min-width: 768px) 359px, 80vw"
+              />
+              <img
+                src="/imageperfil.png"
+                alt={content.hero.avatarLabel}
+                loading="eager"
+                fetchPriority="high"
+                decoding="async"
+                width={1024}
+                height={1024}
+                sizes="(min-width: 768px) 359px, 80vw"
+                className="h-full w-full object-cover"
+              />
+            </picture>
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_22%_18%,var(--brand-mist),transparent_45%)]" />
           </div>
           <div className="rounded-2xl border border-(--border-soft) bg-(--surface-1) p-4">
