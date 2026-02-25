@@ -109,7 +109,7 @@ export const homeContentEs: HomeContent = {
   },
   hero: {
     avatarLabel: 'Avatar',
-    avatarValue: 'Placeholder',
+    avatarValue: 'Foto de perfil',
     availability: 'Disponible remoto - GMT-4',
     ctaCv: 'Ver CV',
     ctaGithub: 'GitHub',
@@ -156,7 +156,8 @@ export const homeContentEs: HomeContent = {
         'Extensión que bloquea distracciones de forma inteligente y activa sesiones enfocadas con baja fricción.',
       stack: ['TypeScript', 'Chrome Extension', 'Storage local', 'UI por componentes'],
       result: 'Reduce tiempo perdido por bloqueo automático y flujo de uso claro.',
-      metric: 'Placeholder: de ~X min/día a ~Y min/día durante Z semanas.',
+      metric:
+        'Métrica clave: duración promedio de sesiones de enfoque y bloqueos automáticos activados por día.',
       links: {
         demo: 'https://github.com/naster3/FocusTube',
         repo: 'https://github.com/naster3/FocusTube',
@@ -165,13 +166,15 @@ export const homeContentEs: HomeContent = {
     {
       tag: 'Backend',
       title: 'API con autenticación JWT',
+      coverImage: '/ecommer.png',
       problem: 'Backend seguro con acceso controlado y tokens con expiración.',
       role: 'Arquitectura por capas, autenticación y protección de recursos sensibles.',
       solution:
         'Login JWT, middleware de autorización, expiración de token y endpoints por dominio.',
       stack: ['Python', 'Flask/FastAPI', 'JWT', 'SQLAlchemy', 'Postgres', 'Docker'],
       result: 'Seguridad consistente y código mantenible con separación de responsabilidades.',
-      metric: 'Placeholder: reducción de errores auth X% y onboarding en Y horas.',
+      metric:
+        'Métrica clave: tasa de errores 401/403, tiempo de integración de clientes y cobertura de endpoints protegidos.',
     },
     {
       tag: 'Frontend',
@@ -186,7 +189,8 @@ export const homeContentEs: HomeContent = {
       stack: ['Frontend', 'React', 'TypeScript', 'Tailwind CSS', 'Diseño responsive'],
       result:
         'Navegación más simple, mensaje de marca más claro y experiencia más consistente en móvil y desktop.',
-      metric: 'Placeholder: mejora en tiempo en página, CTR de contacto y reducción de rebote.',
+      metric:
+        'Métrica clave: CTR hacia contacto, tiempo promedio por sesión y profundidad de navegación por sección.',
       links: {
         demo: 'https://jensenpharmaceutical.com/',
         repo: 'https://jensenpharmaceutical.com/',
@@ -202,7 +206,8 @@ export const homeContentEs: HomeContent = {
         'Pipeline staging -> DW -> marts con incrementales, validaciones y modelo estrella.',
       stack: ['SQL Server/Postgres', 'Modelado dimensional', 'ETL', 'Power BI/Excel'],
       result: 'Fuente de verdad única y mayor trazabilidad para analítica.',
-      metric: 'Placeholder: tiempo de reporte bajo de X a Y y consultas mejoraron X%.',
+      metric:
+        'Métrica clave: tiempo de actualización de reportes, tasa de validaciones superadas y consistencia de KPIs.',
     },
   ],
   projectsSection: {

@@ -109,7 +109,7 @@ export const homeContentEn: HomeContent = {
   },
   hero: {
     avatarLabel: 'Avatar',
-    avatarValue: 'Placeholder',
+    avatarValue: 'Profile photo',
     availability: 'Available remote - GMT-4',
     ctaCv: 'View Resume',
     ctaGithub: 'GitHub',
@@ -155,7 +155,8 @@ export const homeContentEn: HomeContent = {
         'Browser extension that blocks distractions intelligently and enables focused sessions with low-friction UX.',
       stack: ['TypeScript', 'Chrome Extension', 'Local storage', 'Component-based UI'],
       result: 'Reduces wasted time with automatic blocking and a clear user flow.',
-      metric: 'Placeholder: from ~X min/day down to ~Y min/day for Z weeks.',
+      metric:
+        'Key metric: average focus-session length and number of automatic blocking events per day.',
       links: {
         demo: 'https://github.com/naster3/FocusTube',
         repo: 'https://github.com/naster3/FocusTube',
@@ -164,13 +165,15 @@ export const homeContentEn: HomeContent = {
     {
       tag: 'Backend',
       title: 'JWT Authentication API',
+      coverImage: '/ecommer.png',
       problem: 'A secure backend was required with controlled access and expiring tokens.',
       role: 'Implemented layered architecture, authentication flow and protected resources.',
       solution:
         'JWT login, authorization middleware, token expiration handling and domain-based endpoints.',
       stack: ['Python', 'Flask/FastAPI', 'JWT', 'SQLAlchemy', 'Postgres', 'Docker'],
       result: 'Consistent security and maintainable code with clear separation of concerns.',
-      metric: 'Placeholder: auth errors reduced by X% and integration time by Y hours.',
+      metric:
+        'Key metric: 401/403 error rate, client integration lead time, and protected-endpoint coverage.',
     },
     {
       tag: 'Frontend',
@@ -185,7 +188,8 @@ export const homeContentEn: HomeContent = {
       stack: ['Frontend', 'React', 'TypeScript', 'Tailwind CSS', 'Responsive design'],
       result:
         'Simpler navigation, clearer brand messaging and a more consistent experience across mobile and desktop.',
-      metric: 'Placeholder: improved time on page, contact CTR and reduced bounce rate.',
+      metric:
+        'Key metric: contact CTR, average session duration, and navigation depth per section.',
       links: {
         demo: 'https://jensenpharmaceutical.com/',
         repo: 'https://jensenpharmaceutical.com/',
@@ -200,7 +204,8 @@ export const homeContentEn: HomeContent = {
       solution: 'Staging -> DW -> marts pipeline with incrementals, validation and star schema.',
       stack: ['SQL Server/Postgres', 'Dimensional modeling', 'ETL', 'Power BI/Excel'],
       result: 'Single source of truth with better traceability for analytics.',
-      metric: 'Placeholder: reporting time dropped from X to Y and queries improved by X%.',
+      metric:
+        'Key metric: reporting refresh time, validation pass rate, and KPI consistency across marts.',
     },
   ],
   projectsSection: {
