@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { cn, useI18n } from '@/shared'
 
 type ScrollIndicatorProps = {
@@ -18,24 +18,30 @@ export function ScrollIndicator({
   const label = locale === 'es' ? 'Desliza para explorar' : 'Scroll to explore'
   const href = targetId.startsWith('#') ? targetId : `#${targetId}`
   const [opacity, setOpacity] = useState(1)
+  const fadeEndRef = useRef(0)
+  const fadeDistanceRef = useRef(1)
 
   useEffect(() => {
     if (typeof window === 'undefined') return
 
+    const fadeTarget = document.getElementById(fadeTargetId)
+    if (!fadeTarget) {
+      return
+    }
+
     let rafId = 0
+    let resizeObserver: ResizeObserver | null = null
+
+    const updateFadeMetrics = () => {
+      const rect = fadeTarget.getBoundingClientRect()
+      fadeEndRef.current = rect.bottom + window.scrollY
+      fadeDistanceRef.current = Math.max(window.innerHeight * 0.85, 1)
+    }
 
     const updateOpacity = () => {
       rafId = 0
-
-      const fadeTarget = document.getElementById(fadeTargetId)
-      if (!fadeTarget) {
-        setOpacity(1)
-        return
-      }
-
-      const { bottom } = fadeTarget.getBoundingClientRect()
-      const fadeDistance = Math.max(window.innerHeight * 0.85, 1)
-      const nextOpacity = Math.min(1, Math.max(0, bottom / fadeDistance))
+      const bottom = fadeEndRef.current - window.scrollY
+      const nextOpacity = Math.min(1, Math.max(0, bottom / fadeDistanceRef.current))
 
       setOpacity((prev) => {
         if (Math.abs(prev - nextOpacity) < 0.02) return prev
@@ -48,14 +54,23 @@ export function ScrollIndicator({
       rafId = window.requestAnimationFrame(updateOpacity)
     }
 
+    const onResize = () => {
+      updateFadeMetrics()
+      onViewportChange()
+    }
+
+    updateFadeMetrics()
     updateOpacity()
     window.addEventListener('scroll', onViewportChange, { passive: true })
-    window.addEventListener('resize', onViewportChange)
+    window.addEventListener('resize', onResize)
+    resizeObserver = new ResizeObserver(onResize)
+    resizeObserver.observe(fadeTarget)
 
     return () => {
       if (rafId) window.cancelAnimationFrame(rafId)
       window.removeEventListener('scroll', onViewportChange)
-      window.removeEventListener('resize', onViewportChange)
+      window.removeEventListener('resize', onResize)
+      resizeObserver?.disconnect()
     }
   }, [fadeTargetId])
 
