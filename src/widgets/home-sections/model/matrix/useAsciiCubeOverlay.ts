@@ -24,7 +24,7 @@ type AsciiCubeControls = {
 
 export function useAsciiCubeOverlay(
   containerRef: RefObject<HTMLDivElement | null>,
-  preRef: RefObject<HTMLPreElement | null>,
+  canvasRef: RefObject<HTMLCanvasElement | null>,
   runtime: AsciiCubeRuntime,
 ) {
   const controlsRef = useRef<AsciiCubeControls | null>(null)
@@ -36,8 +36,11 @@ export function useAsciiCubeOverlay(
 
   useEffect(() => {
     const container = containerRef.current
-    const pre = preRef.current
-    if (!container || !pre) return
+    const canvas = canvasRef.current
+    if (!container || !canvas) return
+
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
 
     const profile = getAsciiCubeProfile(runtime.qualityTier)
     let grid: AsciiSize = { cols: 72, rows: 28 }
@@ -45,8 +48,39 @@ export function useAsciiCubeOverlay(
     let raf = 0
     let isRunning = false
     let lastTs = 0
+    let width = 0
+    let height = 0
+    let dpr = 1
+    let lineHeight = 14
+    let textColor = '#0c6b8f'
     const startedAt = performance.now()
     const targetFrameMs = 1000 / profile.targetFps
+
+    const refreshPalette = () => {
+      const styles = getComputedStyle(document.documentElement)
+      textColor = styles.getPropertyValue('--brand-ink').trim() || '#0c6b8f'
+    }
+
+    const drawAsciiFrame = (ascii: string) => {
+      ctx.clearRect(0, 0, width, height)
+      ctx.fillStyle = textColor
+      ctx.textBaseline = 'top'
+      ctx.imageSmoothingEnabled = false
+      ctx.font =
+        `${Math.max(11, Math.round(profile.charHeight * 0.8))}px ui-monospace, SFMono-Regular, Menlo, ` +
+        "Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
+
+      const lines = ascii.split('\n')
+      const blockHeight = lines.length * lineHeight
+      const yStart = Math.max(0, Math.floor((height - blockHeight) / 2))
+      const xStart = Math.max(0, Math.floor((width - grid.cols * profile.charWidth) / 2))
+
+      for (let row = 0; row < lines.length; row += 1) {
+        const line = lines[row]
+        if (!line) continue
+        ctx.fillText(line, xStart, yStart + row * lineHeight)
+      }
+    }
 
     const drawAt = (seconds: number) => {
       const rot: Rot = {
@@ -55,16 +89,20 @@ export function useAsciiCubeOverlay(
         c: seconds * 0.7,
       }
 
-      pre.textContent = renderCubeAscii({
-        cube,
-        rot,
-        size: grid,
-      })
+      drawAsciiFrame(renderCubeAscii({ cube, rot, size: grid }))
     }
 
-    const resize = () => {
-      const rect = container.getBoundingClientRect()
-      grid = computeAsciiGridSize(rect.width, Math.max(160, rect.height), profile)
+    const resize = (nextWidth?: number, nextHeight?: number) => {
+      width = Math.max(1, nextWidth ?? container.clientWidth)
+      height = Math.max(1, nextHeight ?? container.clientHeight)
+      dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, 2))
+      lineHeight = Math.max(11, Math.round(profile.charHeight * 0.84))
+
+      canvas.width = Math.floor(width * dpr)
+      canvas.height = Math.floor(height * dpr)
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+
+      grid = computeAsciiGridSize(width, Math.max(160, height), profile)
       cube = getAsciiCubeParams(grid, profile)
       drawAt(0)
     }
@@ -98,8 +136,31 @@ export function useAsciiCubeOverlay(
     }
 
     resize()
-    const resizeObserver = new ResizeObserver(resize)
+    refreshPalette()
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        resize(entry.contentRect.width, entry.contentRect.height)
+        return
+      }
+
+      resize()
+    })
     resizeObserver.observe(container)
+    const themeObserver = new MutationObserver(() => {
+      refreshPalette()
+      if (!isRunning) drawAt(0)
+    })
+    themeObserver.observe(document.documentElement, {
+      attributeFilter: ['class', 'data-theme', 'style'],
+      attributes: true,
+    })
+    const colorSchemeMedia = window.matchMedia('(prefers-color-scheme: dark)')
+    const onColorSchemeChange = () => {
+      refreshPalette()
+      if (!isRunning) drawAt(0)
+    }
+    colorSchemeMedia.addEventListener('change', onColorSchemeChange)
 
     controlsRef.current = { renderStatic, start, stop }
 
@@ -115,8 +176,10 @@ export function useAsciiCubeOverlay(
       controlsRef.current = null
       stop()
       resizeObserver.disconnect()
+      themeObserver.disconnect()
+      colorSchemeMedia.removeEventListener('change', onColorSchemeChange)
     }
-  }, [containerRef, preRef, runtime.qualityTier])
+  }, [canvasRef, containerRef, runtime.qualityTier])
 
   useEffect(() => {
     const controls = controlsRef.current

@@ -1,3 +1,11 @@
+/**
+ * Respaldo del "cubo 2" (cubo geométrico del matrix rain).
+ *
+ * Uso futuro:
+ * 1) Copiar este archivo de nuevo a `src/widgets/home-sections/model/matrix/`
+ * 2) Restaurar imports en `useMatrixCubeCanvas.ts` para dibujar wireframe/face rain.
+ */
+
 import {
   cross,
   dot,

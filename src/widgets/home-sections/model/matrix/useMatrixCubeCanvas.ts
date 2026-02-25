@@ -3,25 +3,15 @@ import {
   getMatrixCubeConfig,
   parseCssColorToRgb,
   rgba,
+  type Pt,
   type MatrixQualityTier,
 } from './matrix-cube'
-import {
-  buildCubeFaceInfo,
-  createCubeVertices,
-  drawCubeWireframe,
-  drawFrontFaceOutlines,
-  getCubeDepthNormalizer,
-  getCubeState,
-  getFrontFaceIndices,
-  sortCubeFacesByDepth,
-} from './matrix-cube-scene'
-import { createMatrixRainState, drawFaceRain, drawMatrixRainColumns } from './matrix-rain-scene'
+import { createMatrixRainState, drawMatrixRainColumns } from './matrix-rain-scene'
 
 type MatrixCanvasRuntime = {
   isActive: boolean
   qualityTier: MatrixQualityTier
   reducedMotion: boolean
-  renderCube?: boolean
 }
 
 type MatrixCanvasControls = {
@@ -49,30 +39,9 @@ export function useMatrixCubeCanvas(
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
-    // Capas fuera de pantalla: aqui se compone el face-rain y luego se mezcla en el canvas principal.
-    const faceLayer = document.createElement('canvas')
-    const maskLayer = document.createElement('canvas')
-    const faceCtx = faceLayer.getContext('2d')
-    const maskCtx = maskLayer.getContext('2d')
-    if (!faceCtx || !maskCtx) return
-
-    const {
-      charset,
-      cubeSize,
-      faceRainColSpacing,
-      faceRainFrontFacesOnly,
-      faceRainMaskBlurMax,
-      faceRainMaskBlurMin,
-      faceRainRowSpacing,
-      faceRainTailMax,
-      faceRainTailMin,
-      fontSize,
-      maxDpr,
-      showFaceRain,
-      showWireframe,
-      targetFps,
-      trailAlpha,
-    } = getMatrixCubeConfig(runtime.qualityTier)
+    const { charset, fontSize, maxDpr, targetFps, trailAlpha } = getMatrixCubeConfig(
+      runtime.qualityTier,
+    )
     let palette = (() => {
       const rootStyles = getComputedStyle(document.documentElement)
       const backgroundCss = rootStyles.getPropertyValue('--bg-main').trim() || '#fffdf7'
@@ -133,8 +102,6 @@ export function useMatrixCubeCanvas(
       }
     }
 
-    const cubeVertices = createCubeVertices(cubeSize)
-
     let dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, maxDpr))
     let width = 0
     let height = 0
@@ -146,6 +113,8 @@ export function useMatrixCubeCanvas(
     let lastFrameTs = 0
     let time = 0
     const targetFrameMs = 1000 / targetFps
+    const cubeFacePolys: Pt[][] = []
+    const cubeFrontFaceIndices = new Set<number>()
 
     const initRain = () => {
       const rain = createMatrixRainState(width, fontSize)
@@ -154,33 +123,21 @@ export function useMatrixCubeCanvas(
       speeds = rain.speeds
     }
 
-    const resize = () => {
+    const resize = (nextWidth?: number, nextHeight?: number) => {
       // Limita el DPR para evitar costos altos de pintado en pantallas densas.
       dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, maxDpr))
-      const bounds = canvas.getBoundingClientRect()
-      width = bounds.width || 900
-      height = bounds.height || 520
+      width = Math.max(1, nextWidth ?? (canvas.clientWidth || 900))
+      height = Math.max(1, nextHeight ?? (canvas.clientHeight || 520))
 
       canvas.width = Math.floor(width * dpr)
       canvas.height = Math.floor(height * dpr)
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
       ctx.imageSmoothingEnabled = false
 
-      faceLayer.width = canvas.width
-      faceLayer.height = canvas.height
-      maskLayer.width = canvas.width
-      maskLayer.height = canvas.height
-      faceCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      maskCtx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      faceCtx.imageSmoothingEnabled = false
-      maskCtx.imageSmoothingEnabled = false
-
       initRain()
       ctx.fillStyle = palette.backgroundCss
       ctx.fillRect(0, 0, width, height)
     }
-
-    const getCubeStateAt = (offset = 0) => getCubeState(cubeVertices, width, height, time, offset)
 
     const draw = (deltaRatio = 1) => {
       time += 0.015 * deltaRatio
@@ -193,50 +150,6 @@ export function useMatrixCubeCanvas(
       ctx.fillStyle = rgba(palette.backgroundRgb, effectiveTrailAlpha)
       ctx.fillRect(0, 0, width, height)
 
-      const cube = getCubeStateAt()
-      const faceInfo = buildCubeFaceInfo(cube.rotated)
-      const zNorm = getCubeDepthNormalizer(faceInfo)
-      sortCubeFacesByDepth(faceInfo)
-      const frontFaceIndices = getFrontFaceIndices(faceInfo)
-      const renderCube = runtimeRef.current.renderCube ?? true
-
-      if (showFaceRain) {
-        drawFaceRain({
-          accentRgb: palette.accentRgb,
-          brandRgb: palette.brandRgb,
-          charset,
-          ctx,
-          dpr,
-          faceCtx,
-          faceInfo,
-          facePolys: cube.facePolys,
-          faceRainColSpacing,
-          faceRainFrontFacesOnly,
-          faceRainMaskBlurMax,
-          faceRainMaskBlurMin,
-          faceRainRowSpacing,
-          faceRainTailMax,
-          faceRainTailMin,
-          fontSize,
-          frontFaceIndices,
-          height,
-          maskCtx,
-          textMainRgb: palette.textMainRgb,
-          time,
-          width,
-          zNorm,
-        })
-      }
-
-      if (renderCube && !showWireframe) {
-        drawFrontFaceOutlines({
-          brandRgb: palette.brandRgb,
-          ctx,
-          facePolys: cube.facePolys,
-          frontFaceIndices,
-        })
-      }
-
       drawMatrixRainColumns({
         accentRgb: palette.accentRgb,
         brandRgb: palette.brandRgb,
@@ -245,24 +158,15 @@ export function useMatrixCubeCanvas(
         ctx,
         deltaRatio,
         drops,
-        facePolys: cube.facePolys,
+        facePolys: cubeFacePolys,
         fontSize,
-        frontFaceIndices,
+        frontFaceIndices: cubeFrontFaceIndices,
         height,
-        showFaceRain,
+        showFaceRain: false,
         speeds,
         textMainRgb: palette.textMainRgb,
         time,
       })
-
-      if (renderCube && showWireframe) {
-        drawCubeWireframe({
-          brandRgb: palette.brandRgb,
-          ctx,
-          getCubeStateAt,
-          projected: cube.projected,
-        })
-      }
     }
 
     const step = (timestamp: number) => {
@@ -301,7 +205,15 @@ export function useMatrixCubeCanvas(
     }
 
     resize()
-    const resizeObserver = new ResizeObserver(resize)
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0]
+      if (entry) {
+        resize(entry.contentRect.width, entry.contentRect.height)
+        return
+      }
+
+      resize()
+    })
     resizeObserver.observe(canvas)
     const themeObserver = new MutationObserver(() => {
       refreshPalette()

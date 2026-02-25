@@ -1,5 +1,11 @@
 import { hash01, pointInPolygon, rgba, type Pt, type Rgb } from './matrix-cube'
-import type { CubeFaceInfo } from './matrix-cube-scene'
+
+export type CubeFaceInfo = {
+  facing: number
+  index: number
+  light: number
+  z: number
+}
 
 export type MatrixRainState = {
   columns: number

@@ -58,7 +58,6 @@ const matrixCubeBaseConfig: MatrixCubeConfig = {
 const matrixCubeQualityPresets: Record<MatrixQualityTier, MatrixCubeConfig> = {
   high: {
     ...matrixCubeBaseConfig,
-    showFaceRain: true,
     targetFps: 36,
     trailAlpha: 0.26,
   },
