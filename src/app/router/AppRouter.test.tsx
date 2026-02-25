@@ -61,11 +61,11 @@ describe('AppRouter', () => {
     ).toBeInTheDocument()
   }, 10000)
 
-  it('redirecciona rutas desconocidas a home', async () => {
+  it('renderiza la pagina 404 en rutas desconocidas', async () => {
     renderWithRouter('/no-existe')
 
     expect(
-      await screen.findByRole('heading', { name: /Ingeniero de software/i }, { timeout: 12000 }),
+      await screen.findByRole('heading', { name: /P[aá]gina no encontrada/i }, { timeout: 12000 }),
     ).toBeInTheDocument()
   }, 15000)
 })

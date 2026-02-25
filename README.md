@@ -43,3 +43,9 @@ pnpm test
 
 - Estructura por capas: `app`, `pages`, `widgets`, `shared`
 - Documento interno: `src/README.md`
+
+## Security Headers (HSTS)
+
+- Netlify: este repo incluye `public/_headers` con `Strict-Transport-Security`.
+- Vercel: este repo incluye `vercel.json` con `Strict-Transport-Security`.
+- Importante: HSTS solo aplica sobre respuestas HTTPS. No aparece en `http://localhost`.

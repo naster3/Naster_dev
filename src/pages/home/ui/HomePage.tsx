@@ -1,5 +1,4 @@
-import { Helmet } from 'react-helmet-async'
-import { useI18n } from '@/shared'
+import { SeoHead, useI18n } from '@/shared'
 import {
   AboutSection,
   ContactSection,
@@ -12,14 +11,16 @@ import {
 } from '@/widgets/home-sections'
 
 export function HomePage() {
-  const { messages } = useI18n()
+  const { locale, messages } = useI18n()
 
   return (
     <>
-      <Helmet>
-        <title>{messages.pages.home.title}</title>
-        <meta name="description" content={messages.pages.home.description} />
-      </Helmet>
+      <SeoHead
+        title={messages.pages.home.title}
+        description={messages.pages.home.description}
+        locale={locale}
+        path="/"
+      />
 
       <main className="space-y-24 md:space-y-32">
         <MatrixCubeSection />

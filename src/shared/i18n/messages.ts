@@ -19,6 +19,7 @@ export type I18nMessages = {
     about: PageMeta
     contact: PageMeta
     home: PageMeta
+    notFound: PageMeta
     projects: PageMeta
     values: PageMeta
   }
@@ -51,6 +52,10 @@ export const i18nMessages: Record<Locale, I18nMessages> = {
       home: {
         description: 'Portafolio personal: backend, APIs, data pipelines y frontend con React.',
         title: 'Naster Dev | Ingeniero de software Full stack',
+      },
+      notFound: {
+        description: 'La ruta solicitada no existe en este portafolio.',
+        title: 'Página no encontrada | Naster Dev',
       },
       projects: {
         description: 'Case studies de proyectos: problema, solucion, stack y resultados.',
@@ -88,6 +93,10 @@ export const i18nMessages: Record<Locale, I18nMessages> = {
       home: {
         description: 'Personal portfolio: backend, APIs, data pipelines and React frontend.',
         title: 'Naster Dev | Software Engineer Full Stack',
+      },
+      notFound: {
+        description: 'The requested route does not exist on this portfolio.',
+        title: 'Page not found | Naster Dev',
       },
       projects: {
         description: 'Project case studies: problem, solution, stack and outcomes.',

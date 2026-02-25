@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { HelmetProvider } from 'react-helmet-async'
-import { HashRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router-dom'
 import { I18nProvider } from '@/shared/i18n'
 import { ThemeProvider } from './ThemeProvider'
 
@@ -13,7 +13,7 @@ export function AppProviders({ children }: AppProvidersProps) {
     <HelmetProvider>
       <ThemeProvider>
         <I18nProvider>
-          <HashRouter>{children}</HashRouter>
+          <BrowserRouter>{children}</BrowserRouter>
         </I18nProvider>
       </ThemeProvider>
     </HelmetProvider>
