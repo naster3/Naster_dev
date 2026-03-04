@@ -164,6 +164,7 @@ export const homeContentEs: HomeContent = {
       },
     },
     {
+      isHidden: true,
       tag: 'Backend',
       title: 'API con autenticación JWT',
       coverImage: '/ecommer.png',
@@ -198,6 +199,7 @@ export const homeContentEs: HomeContent = {
       },
     },
     {
+      isHidden: true,
       tag: 'Data',
       title: 'Sistema de datos / DW',
       problem: 'Datos dispersos que frenaban reportes confiables y seguimiento de KPIs.',

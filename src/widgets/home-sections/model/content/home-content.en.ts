@@ -163,6 +163,7 @@ export const homeContentEn: HomeContent = {
       },
     },
     {
+      isHidden: true,
       tag: 'Backend',
       title: 'JWT Authentication API',
       coverImage: '/ecommer.png',
@@ -197,6 +198,7 @@ export const homeContentEn: HomeContent = {
       },
     },
     {
+      isHidden: true,
       tag: 'Data',
       title: 'Data system / DW',
       problem: 'Scattered data was slowing down trustworthy reporting and KPI tracking.',

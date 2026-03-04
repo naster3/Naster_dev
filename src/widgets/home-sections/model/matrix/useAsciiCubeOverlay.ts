@@ -70,10 +70,14 @@ export function useAsciiCubeOverlay(
         `${Math.max(11, Math.round(profile.charHeight * 0.8))}px ui-monospace, SFMono-Regular, Menlo, ` +
         "Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace"
 
-      const lines = ascii.split('\n')
+      const normalizedAscii = ascii.endsWith('\n') ? ascii.slice(0, -1) : ascii
+      const lines = normalizedAscii.split('\n')
+      const maxLineWidth = lines.reduce((maxWidth, line) => {
+        return Math.max(maxWidth, ctx.measureText(line).width)
+      }, 0)
       const blockHeight = lines.length * lineHeight
       const yStart = Math.max(0, Math.floor((height - blockHeight) / 2))
-      const xStart = Math.max(0, Math.floor((width - grid.cols * profile.charWidth) / 2))
+      const xStart = Math.max(0, Math.floor((width - maxLineWidth) / 2))
 
       for (let row = 0; row < lines.length; row += 1) {
         const line = lines[row]

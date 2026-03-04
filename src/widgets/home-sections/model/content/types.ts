@@ -7,6 +7,7 @@ export type QuickEvidenceItem = {
 
 export type ProjectItem = {
   demoLabel?: string
+  isHidden?: boolean
   tag: string
   title: string
   problem: string

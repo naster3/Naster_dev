@@ -115,10 +115,15 @@ export function ProjectsSection() {
       ? 'No hay proyectos en esta categoría todavía.'
       : 'No projects in this category yet.'
 
+  const visibleProjects = useMemo(
+    () => content.projects.filter((project) => !project.isHidden),
+    [content.projects],
+  )
+
   const filteredProjects = useMemo(() => {
-    if (activeFilter === 'all') return content.projects
-    return content.projects.filter((project) => resolveProjectTrack(project) === activeFilter)
-  }, [activeFilter, content.projects])
+    if (activeFilter === 'all') return visibleProjects
+    return visibleProjects.filter((project) => resolveProjectTrack(project) === activeFilter)
+  }, [activeFilter, visibleProjects])
 
   return (
     <section id="proyectos" className="space-y-10">

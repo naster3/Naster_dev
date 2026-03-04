@@ -11,7 +11,7 @@ type SeoHeadProps = {
   type?: 'article' | 'website'
 }
 
-const DEFAULT_IMAGE_PATH = '/imageperfil.png'
+const DEFAULT_IMAGE_PATH = '/foto%20de%20perfil.png'
 const DEFAULT_SITE_NAME = 'Naster Dev'
 
 function getSiteOrigin() {

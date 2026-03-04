@@ -1,9 +1,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
-import { ArrowUpRight } from 'lucide-react'
-import { portfolioLinks, useI18n } from '@/shared'
+import { useI18n } from '@/shared'
 import { homeContentByLocale, motionViewport, sectionReveal, stagger } from '../../model'
-import { primaryBtnClass } from '../styles'
 
 const titleStagger = {
   hidden: {},
@@ -135,28 +133,13 @@ export function HeroSection() {
           >
             {content.hero.subtitle}
           </motion.p>
-          <div className="mt-7 flex flex-wrap gap-3">
-            <a
-              href={portfolioLinks.cv}
-              target="_blank"
-              rel="noreferrer"
-              className={primaryBtnClass}
-            >
-              {content.hero.ctaCv} <ArrowUpRight size={16} />
-            </a>
-          </div>
         </motion.div>
 
         <motion.div variants={sectionReveal} className="space-y-5 md:col-span-5">
           <div className="relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-[2.2rem] border border-(--border-soft) bg-[linear-gradient(155deg,var(--surface-solid)_10%,var(--surface-1)_48%,var(--surface-2)_100%)]">
             <picture className="h-full w-full">
-              <source
-                type="image/webp"
-                srcSet="/imageperfil-384.webp 384w, /imageperfil-768.webp 768w"
-                sizes="(min-width: 768px) 359px, 80vw"
-              />
               <img
-                src="/imageperfil.png"
+                src="/foto%20de%20perfil.png"
                 alt={content.hero.avatarLabel}
                 loading="eager"
                 fetchPriority="high"

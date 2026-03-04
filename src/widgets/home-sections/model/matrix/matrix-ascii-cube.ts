@@ -166,7 +166,7 @@ export function renderCubeAscii(params: {
   const { cube, rot, size } = params
   const { cols, rows } = size
   const buf = makeBuffer(size)
-  const light = normalize({ x: 0.35, y: -0.25, z: 1 })
+  const light = normalize({ x: 0.35, y: -0.25, z: -1 })
   const step = cube.cubeHalf / Math.max(8, cube.sampleDivisor)
 
   const project = (p: Vec3) => {
@@ -203,7 +203,7 @@ export function renderCubeAscii(params: {
 
   for (const face of faces) {
     const nRot = normalize(rotate(face.normal, rot))
-    if (nRot.z <= 0.02) continue
+    if (nRot.z >= -0.02) continue
 
     for (let u = uMin; u <= uMax; u += step) {
       for (let v = uMin; v <= uMax; v += step) {

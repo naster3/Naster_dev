@@ -58,7 +58,7 @@ export function MatrixCubeSection() {
             locale === 'es' ? 'Animacion de campo matricial 3D' : '3D matrix field animation'
           }
         />
-        <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden px-3 py-2">
+        <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
           <canvas ref={asciiCanvasRef} className="h-full w-full" aria-hidden="true" />
         </div>
       </div>
