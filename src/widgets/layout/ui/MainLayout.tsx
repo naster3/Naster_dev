@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { portfolioLinks, useI18n } from '@/shared'
+import { portfolioLinks, trackPortfolioEvent, useI18n } from '@/shared'
 import { cn } from '@/shared/lib'
 import { NavItem } from '@/shared/ui/navigation'
 import { sectionLinks } from '../model'
@@ -52,11 +52,15 @@ const mobileMenuReveal = {
 export function MainLayout({ children }: MainLayoutProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const location = useLocation()
-  const { messages } = useI18n()
+  const { locale, messages } = useI18n()
   const isHomeRoute = location.pathname === '/'
+  const skipToContentLabel = locale === 'es' ? 'Saltar al contenido' : 'Skip to content'
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-clip">
+      <a href="#main-content" className="skip-link">
+        {skipToContentLabel}
+      </a>
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute left-[-15%] top-[-10%] h-144 w-xl rounded-full bg-[radial-gradient(circle,var(--brand-mist),transparent_68%)]" />
         <div className="absolute bottom-[-12%] right-[-12%] h-136 w-136 rounded-full bg-[radial-gradient(circle,var(--accent-mist),transparent_70%)]" />
@@ -71,6 +75,7 @@ export function MainLayout({ children }: MainLayoutProps) {
         <div className="mx-auto flex h-18 w-full max-w-300 items-center justify-between px-4 md:px-6">
           <Link
             to="/"
+            onClick={() => trackPortfolioEvent('header_logo_click', { target: 'home' })}
             className="flex items-center gap-2.5 text-(--text-main) transition-colors duration-200 hover:text-(--brand-ink)"
           >
             <motion.span
@@ -122,6 +127,9 @@ export function MainLayout({ children }: MainLayoutProps) {
               href={portfolioLinks.github}
               target="_blank"
               rel="noreferrer"
+              onClick={() =>
+                trackPortfolioEvent('cta_click', { source: 'header', target: 'github' })
+              }
               whileHover={{ y: -1 }}
               className="text-sm font-semibold text-(--text-soft) underline-offset-4 transition-colors hover:text-(--text-main) hover:underline"
             >
@@ -179,6 +187,9 @@ export function MainLayout({ children }: MainLayoutProps) {
                 href={portfolioLinks.github}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  trackPortfolioEvent('cta_click', { source: 'mobile_menu', target: 'github' })
+                }
                 initial={{ opacity: 0, y: -6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.03, duration: 0.14 }}
@@ -192,6 +203,8 @@ export function MainLayout({ children }: MainLayoutProps) {
       </motion.header>
 
       <div
+        id="main-content"
+        tabIndex={-1}
         className={cn(
           'mx-auto flex w-full max-w-300 flex-1 flex-col px-4 md:px-6 [&>main]:flex-1',
           isHomeRoute ? 'pb-10 pt-0 md:pb-16 md:pt-0' : 'py-10 md:py-16',

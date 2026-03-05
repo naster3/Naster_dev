@@ -1,5 +1,6 @@
-import { useReducer, type FormEvent } from 'react'
+import { useEffect, useReducer, useRef, type FormEvent } from 'react'
 import type { Locale } from '@/shared/i18n'
+import { trackPortfolioEvent } from '@/shared/lib'
 import type { HomeContent } from '../content'
 
 type FormStatus = {
@@ -38,6 +39,9 @@ type ContactContent = HomeContent['contact']
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const contactFields: readonly ContactField[] = ['name', 'email', 'message']
+const MAX_NAME_LENGTH = 120
+const MAX_MESSAGE_LENGTH = 4000
+const MIN_HUMAN_SUBMIT_MS = import.meta.env.MODE === 'test' ? 0 : 900
 
 function isContactField(value: string): value is ContactField {
   return contactFields.some((field) => field === value)
@@ -51,6 +55,39 @@ function buildInvalidEmailMessage(locale: Locale) {
   return locale === 'es' ? 'Escribe un email válido.' : 'Enter a valid email address.'
 }
 
+function buildLengthExceededMessage(locale: Locale) {
+  return locale === 'es'
+    ? 'El mensaje es demasiado largo. Reduce el contenido e intenta de nuevo.'
+    : 'The message is too long. Please shorten it and try again.'
+}
+
+function buildNameTooLongMessage(locale: Locale) {
+  return locale === 'es' ? 'El nombre es demasiado largo.' : 'The name is too long.'
+}
+
+function isEndpointAllowed(endpoint: string) {
+  try {
+    const parsed = new URL(endpoint)
+    const isLocalhost = parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1'
+    if (parsed.protocol !== 'https:' && !isLocalhost) return false
+
+    const allowedHostsRaw = import.meta.env.VITE_CONTACT_ALLOWED_HOSTS?.trim()
+    if (!allowedHostsRaw) return true
+
+    const allowedHosts = allowedHostsRaw
+      .split(',')
+      .map((host: string) => host.trim().toLowerCase())
+      .filter(Boolean)
+
+    const currentHost = parsed.hostname.toLowerCase()
+    return allowedHosts.some(
+      (host: string) => currentHost === host || currentHost.endsWith(`.${host}`),
+    )
+  } catch {
+    return false
+  }
+}
+
 function validateContactPayload(
   payload: ContactFormData,
   content: ContactContent,
@@ -60,6 +97,8 @@ function validateContactPayload(
 
   if (!payload.name) {
     errors.name = buildRequiredFieldMessage(content.form.name, locale)
+  } else if (payload.name.length > MAX_NAME_LENGTH) {
+    errors.name = buildNameTooLongMessage(locale)
   }
 
   if (!payload.email) {
@@ -70,6 +109,8 @@ function validateContactPayload(
 
   if (!payload.message) {
     errors.message = buildRequiredFieldMessage(content.form.message, locale)
+  } else if (payload.message.length > MAX_MESSAGE_LENGTH) {
+    errors.message = buildLengthExceededMessage(locale)
   }
 
   return errors
@@ -208,9 +249,14 @@ const initialState: ContactFormState = {
 
 export function useContactForm(content: ContactContent, locale: Locale) {
   const [state, dispatch] = useReducer(transitionContactFormState, initialState)
+  const sessionStartedAtRef = useRef(0)
   const status = getStatusFromState(state, content.status.sending)
   const isSubmitting = state.tag === 'validating' || state.tag === 'sending'
   const contactFormEndpoint = import.meta.env.VITE_CONTACT_FORM_ENDPOINT?.trim()
+
+  useEffect(() => {
+    sessionStartedAtRef.current = Date.now()
+  }, [])
 
   const handleFieldInput = (event: FormEvent<HTMLFormElement>) => {
     if (isSubmitting) return
@@ -260,6 +306,17 @@ export function useContactForm(content: ContactContent, locale: Locale) {
         message: content.status.missingEndpoint,
         fieldErrors: {},
       })
+      trackPortfolioEvent('contact_submit', { locale, reason: 'missing_endpoint', status: 'error' })
+      return
+    }
+
+    if (!isEndpointAllowed(contactFormEndpoint)) {
+      dispatch({
+        type: 'VALIDATION_FAILED',
+        message: content.status.missingEndpoint,
+        fieldErrors: {},
+      })
+      trackPortfolioEvent('contact_submit', { locale, reason: 'invalid_endpoint', status: 'error' })
       return
     }
 
@@ -270,6 +327,23 @@ export function useContactForm(content: ContactContent, locale: Locale) {
         message: content.status.success,
       })
       form.reset()
+      sessionStartedAtRef.current = Date.now()
+      trackPortfolioEvent('contact_submit', { locale, reason: 'honeypot', status: 'blocked' })
+      return
+    }
+
+    if (Date.now() - sessionStartedAtRef.current < MIN_HUMAN_SUBMIT_MS) {
+      dispatch({
+        type: 'SEND_SUCCESS',
+        message: content.status.success,
+      })
+      form.reset()
+      sessionStartedAtRef.current = Date.now()
+      trackPortfolioEvent('contact_submit', {
+        locale,
+        reason: 'submit_too_fast',
+        status: 'blocked',
+      })
       return
     }
 
@@ -285,10 +359,17 @@ export function useContactForm(content: ContactContent, locale: Locale) {
         message: content.status.success,
       })
       form.reset()
+      sessionStartedAtRef.current = Date.now()
+      trackPortfolioEvent('contact_submit', { locale, status: 'success' })
     } catch {
       dispatch({
         type: 'SEND_FAILED',
         message: content.status.error,
+      })
+      trackPortfolioEvent('contact_submit', {
+        locale,
+        status: 'error',
+        reason: 'network_or_server',
       })
     }
   }

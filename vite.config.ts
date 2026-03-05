@@ -12,11 +12,13 @@ export default defineConfig({
     },
   },
   test: {
+    include: ['src/**/*.test.ts', 'src/**/*.test.tsx'],
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
     css: true,
     testTimeout: 15000,
     hookTimeout: 15000,
+    exclude: ['tests/e2e/**', 'playwright.config.ts'],
     coverage: {
       provider: 'v8',
       reporter: ['text', 'html'],

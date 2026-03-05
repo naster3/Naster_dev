@@ -139,7 +139,7 @@ export function HeroSection() {
           <div className="relative mx-auto flex aspect-square w-full max-w-90 items-center justify-center overflow-hidden rounded-[2.2rem] border border-(--border-soft) bg-[linear-gradient(155deg,var(--surface-solid)_10%,var(--surface-1)_48%,var(--surface-2)_100%)]">
             <picture className="h-full w-full">
               <img
-                src="/foto%20de%20perfil.png"
+                src="/profile-photo.png"
                 alt={content.hero.avatarLabel}
                 loading="eager"
                 fetchPriority="high"

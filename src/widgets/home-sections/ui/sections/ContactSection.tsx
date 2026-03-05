@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { CalendarClock, ExternalLink, Github, Mail } from 'lucide-react'
-import { portfolioLinks, useI18n } from '@/shared'
+import { portfolioLinks, trackPortfolioEvent, useI18n } from '@/shared'
 import { cn } from '@/shared/lib'
 import { homeContentByLocale, motionViewport, sectionReveal, useContactForm } from '../../model'
 import { primaryBtnClass } from '../styles'
@@ -28,6 +28,7 @@ export function ContactSection() {
           onInput={handleFieldInput}
           onSubmit={handleSubmit}
           aria-busy={isSubmitting}
+          aria-label={locale === 'es' ? 'Formulario de contacto' : 'Contact form'}
           className="space-y-4 rounded-2xl border border-(--border-soft) bg-(--surface-1) p-6 md:col-span-7"
         >
           <input
@@ -149,6 +150,9 @@ export function ContactSection() {
             </h3>
             <a
               href={portfolioLinks.email}
+              onClick={() =>
+                trackPortfolioEvent('cta_click', { source: 'contact_card', target: 'email' })
+              }
               className="mt-2 inline-flex items-center gap-2 text-(--text-soft)"
             >
               <Mail size={16} />
@@ -163,6 +167,9 @@ export function ContactSection() {
               href={portfolioLinks.calendly}
               target="_blank"
               rel="noreferrer"
+              onClick={() =>
+                trackPortfolioEvent('cta_click', { source: 'contact_card', target: 'calendly' })
+              }
               className="mt-2 inline-flex items-center gap-2 text-(--text-soft)"
             >
               <CalendarClock size={16} />
@@ -178,6 +185,9 @@ export function ContactSection() {
                 href={portfolioLinks.linkedin}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  trackPortfolioEvent('cta_click', { source: 'contact_card', target: 'linkedin' })
+                }
                 className="inline-flex items-center gap-2 text-(--text-soft)"
               >
                 <ExternalLink size={16} />
@@ -187,6 +197,9 @@ export function ContactSection() {
                 href={portfolioLinks.github}
                 target="_blank"
                 rel="noreferrer"
+                onClick={() =>
+                  trackPortfolioEvent('cta_click', { source: 'contact_card', target: 'github' })
+                }
                 className="inline-flex items-center gap-2 text-(--text-soft)"
               >
                 <Github size={16} />

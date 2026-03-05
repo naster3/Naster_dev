@@ -2,7 +2,7 @@
 import { ArrowUpRight, ExternalLink, Github } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { portfolioLinks, useI18n } from '@/shared'
+import { portfolioLinks, trackPortfolioEvent, useI18n } from '@/shared'
 import { cn } from '@/shared/lib'
 import { homeContentByLocale, motionViewport, sectionReveal, stagger } from '../../model'
 import { primaryBtnClass, secondaryBtnClass } from '../styles'
@@ -36,12 +36,12 @@ const frontendSignals = [
   'web',
 ]
 
-const responsiveCoverImages: Record<
+const coverImageMetadata: Record<
   string,
   {
     height: number
     sizes: string
-    srcSet: string
+    srcSet?: string
     width: number
   }
 > = {
@@ -51,6 +51,16 @@ const responsiveCoverImages: Record<
     srcSet:
       '/FocusTube_Blocker_portfolio_cover_iconsDecor-640.webp 640w, /FocusTube_Blocker_portfolio_cover_iconsDecor-960.webp 960w',
     width: 1600,
+  },
+  '/ecommer.png': {
+    height: 886,
+    sizes: '(min-width: 768px) 493px, 92vw',
+    width: 1899,
+  },
+  '/jensen.png': {
+    height: 883,
+    sizes: '(min-width: 768px) 493px, 92vw',
+    width: 1896,
   },
 }
 
@@ -147,7 +157,13 @@ export function ProjectsSection() {
                   key={option.key}
                   type="button"
                   aria-pressed={isActive}
-                  onClick={() => setActiveFilter(option.key)}
+                  onClick={() => {
+                    setActiveFilter(option.key)
+                    trackPortfolioEvent('projects_filter_change', {
+                      filter: option.key,
+                      locale,
+                    })
+                  }}
                   className={cn(
                     secondaryBtnClass,
                     'px-4 py-2 text-xs',
@@ -165,6 +181,9 @@ export function ProjectsSection() {
             href={portfolioLinks.github}
             target="_blank"
             rel="noreferrer"
+            onClick={() =>
+              trackPortfolioEvent('cta_click', { source: 'projects_header', target: 'github' })
+            }
             className={secondaryBtnClass}
           >
             {content.projectsSection.ctaRepos} <Github size={16} />
@@ -173,6 +192,9 @@ export function ProjectsSection() {
             href={portfolioLinks.docs}
             target="_blank"
             rel="noreferrer"
+            onClick={() =>
+              trackPortfolioEvent('cta_click', { source: 'projects_header', target: 'docs' })
+            }
             className={secondaryBtnClass}
           >
             {content.projectsSection.ctaDocs} <ExternalLink size={16} />
@@ -193,9 +215,7 @@ export function ProjectsSection() {
           const docsUrl = project.links?.docs ?? portfolioLinks.docs
           const demoLabel = project.demoLabel ?? content.projectsSection.linkLabels.demo
           const showRepoButton = repoUrl !== demoUrl || !project.demoLabel
-          const responsiveCover = project.coverImage
-            ? responsiveCoverImages[project.coverImage]
-            : undefined
+          const coverMeta = project.coverImage ? coverImageMetadata[project.coverImage] : undefined
 
           return (
             <motion.article
@@ -215,24 +235,35 @@ export function ProjectsSection() {
                   <div className="relative aspect-16/10 overflow-hidden rounded-2xl border border-(--border-soft) bg-[linear-gradient(130deg,var(--surface-solid)_15%,var(--surface-1)_60%,var(--surface-2)_100%)]">
                     {project.coverImage ? (
                       <>
-                        {responsiveCover ? (
+                        {coverMeta?.srcSet ? (
                           <picture className="h-full w-full">
                             <source
                               type="image/webp"
-                              srcSet={responsiveCover.srcSet}
-                              sizes={responsiveCover.sizes}
+                              srcSet={coverMeta.srcSet}
+                              sizes={coverMeta.sizes}
                             />
                             <img
                               src={project.coverImage}
                               alt={project.title}
                               loading="lazy"
                               decoding="async"
-                              width={responsiveCover.width}
-                              height={responsiveCover.height}
-                              sizes={responsiveCover.sizes}
+                              width={coverMeta.width}
+                              height={coverMeta.height}
+                              sizes={coverMeta.sizes}
                               className="h-full w-full object-cover"
                             />
                           </picture>
+                        ) : coverMeta ? (
+                          <img
+                            src={project.coverImage}
+                            alt={project.title}
+                            loading="lazy"
+                            decoding="async"
+                            width={coverMeta.width}
+                            height={coverMeta.height}
+                            sizes={coverMeta.sizes}
+                            className="h-full w-full object-cover"
+                          />
                         ) : (
                           <img
                             src={project.coverImage}
@@ -253,6 +284,12 @@ export function ProjectsSection() {
                       href={demoUrl}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() =>
+                        trackPortfolioEvent('project_link_click', {
+                          action: 'demo',
+                          project: project.title,
+                        })
+                      }
                       className={cn(secondaryBtnClass, 'px-4 py-2 text-xs')}
                     >
                       {demoLabel}
@@ -262,6 +299,12 @@ export function ProjectsSection() {
                         href={repoUrl}
                         target="_blank"
                         rel="noreferrer"
+                        onClick={() =>
+                          trackPortfolioEvent('project_link_click', {
+                            action: 'repo',
+                            project: project.title,
+                          })
+                        }
                         className={cn(secondaryBtnClass, 'px-4 py-2 text-xs')}
                       >
                         {content.projectsSection.linkLabels.repo}
@@ -271,6 +314,12 @@ export function ProjectsSection() {
                       href={docsUrl}
                       target="_blank"
                       rel="noreferrer"
+                      onClick={() =>
+                        trackPortfolioEvent('project_link_click', {
+                          action: 'docs',
+                          project: project.title,
+                        })
+                      }
                       className={cn(secondaryBtnClass, 'px-4 py-2 text-xs')}
                     >
                       {content.projectsSection.linkLabels.docs}
@@ -342,10 +391,24 @@ export function ProjectsSection() {
         viewport={motionViewport.deep}
         className="flex flex-wrap items-center justify-center gap-3"
       >
-        <a href={portfolioLinks.cv} target="_blank" rel="noreferrer" className={primaryBtnClass}>
+        <a
+          href={portfolioLinks.cv}
+          target="_blank"
+          rel="noreferrer"
+          onClick={() =>
+            trackPortfolioEvent('cta_click', { source: 'projects_footer', target: 'cv' })
+          }
+          className={primaryBtnClass}
+        >
           {content.projectsSection.ctaCv} <ArrowUpRight size={16} />
         </a>
-        <Link to="/contacto" className={secondaryBtnClass}>
+        <Link
+          to="/contacto"
+          onClick={() =>
+            trackPortfolioEvent('cta_click', { source: 'projects_footer', target: 'contact' })
+          }
+          className={secondaryBtnClass}
+        >
           {content.projectsSection.ctaContact}
         </Link>
       </motion.div>

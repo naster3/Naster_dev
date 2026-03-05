@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion'
 import { BookOpenText, CalendarClock, Clock3, FileText, Github, Mail, Rocket } from 'lucide-react'
-import { portfolioLinks, useI18n } from '@/shared'
+import { portfolioLinks, trackPortfolioEvent, useI18n } from '@/shared'
 import { homeContentByLocale, motionViewport, sectionReveal } from '../../model'
 
 export function HomeFooter() {
   const { locale } = useI18n()
   const content = homeContentByLocale[locale]
   const currentYear = new Date().getFullYear()
-  const actionsLabel = locale === 'es' ? 'Acciones rapidas' : 'Quick actions'
+  const actionsLabel = locale === 'es' ? 'Acciones rápidas' : 'Quick actions'
   const portfolioTitle = 'Naster Dev'
   const summaryLabel =
     locale === 'es'
@@ -106,6 +106,12 @@ export function HomeFooter() {
                     href={action.href}
                     target={action.external ? '_blank' : undefined}
                     rel={action.external ? 'noreferrer' : undefined}
+                    onClick={() =>
+                      trackPortfolioEvent('cta_click', {
+                        source: 'footer',
+                        target: action.key,
+                      })
+                    }
                     className={actionClass}
                   >
                     <span className="inline-flex items-center gap-2">

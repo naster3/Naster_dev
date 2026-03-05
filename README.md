@@ -28,6 +28,7 @@ pnpm dev
 
 ```bash
 VITE_CONTACT_FORM_ENDPOINT=https://formspree.io/f/tu_form_id
+VITE_CONTACT_ALLOWED_HOSTS=formspree.io
 ```
 
 ## Scripts útiles

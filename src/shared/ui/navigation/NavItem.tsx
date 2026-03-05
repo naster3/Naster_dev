@@ -17,7 +17,7 @@ export function NavItem({ children, to, onClick }: NavItemProps) {
       to={to}
       onClick={onClick}
       className={cn(
-        'inline-flex rounded-full px-3 py-2 text-sm font-medium transition',
+        'inline-flex rounded-full px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-(--brand-mist)',
         isActive
           ? 'bg-(--brand-ink) text-white'
           : 'text-(--text-soft) hover:bg-white/70 hover:text-(--text-main)',
