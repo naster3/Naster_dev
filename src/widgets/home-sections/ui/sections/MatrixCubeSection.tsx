@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion'
-import { useRef } from 'react'
+import { useState, useRef } from 'react'
 import { useI18n } from '@/shared'
 import {
+  detectMatrixQualityTier,
   motionViewport,
   sectionReveal,
   useAnimationActivity,
@@ -16,9 +17,12 @@ export function MatrixCubeSection() {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const sectionRef = useRef<HTMLElement | null>(null)
   const { locale } = useI18n()
+  const [qualityTier] = useState<MatrixQualityTier>(() => detectMatrixQualityTier())
 
-  const activity = useAnimationActivity(sectionRef, { threshold: motionViewport.standard.amount })
-  const qualityTier: MatrixQualityTier = 'high'
+  const activity = useAnimationActivity(sectionRef, {
+    rootMargin: '12% 0px',
+    threshold: 0.05,
+  })
 
   useMatrixCubeCanvas(canvasRef, {
     isActive: activity.isActive,

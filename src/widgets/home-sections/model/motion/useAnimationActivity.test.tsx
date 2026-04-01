@@ -144,7 +144,7 @@ describe('useAnimationActivity', () => {
     )
   })
 
-  it('respeta reduced motion aunque el elemento este en viewport', () => {
+  it('reporta reduced motion sin apagar la escena cuando el elemento esta en viewport', () => {
     const matchMedia = installMatchMediaMock(true)
     render(<ActivityProbe />)
 
@@ -153,7 +153,7 @@ describe('useAnimationActivity', () => {
     })
 
     expect(screen.getByTestId('activity')).toHaveTextContent(
-      'active:false|inView:true|visible:true|reduced:true',
+      'active:true|inView:true|visible:true|reduced:true',
     )
 
     act(() => {

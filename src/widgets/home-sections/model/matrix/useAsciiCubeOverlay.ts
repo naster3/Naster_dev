@@ -168,9 +168,7 @@ export function useAsciiCubeOverlay(
 
     controlsRef.current = { renderStatic, start, stop }
 
-    if (runtimeRef.current.reducedMotion) {
-      renderStatic()
-    } else if (runtimeRef.current.isActive) {
+    if (runtimeRef.current.isActive) {
       start()
     } else {
       renderStatic()
@@ -189,16 +187,11 @@ export function useAsciiCubeOverlay(
     const controls = controlsRef.current
     if (!controls) return
 
-    if (runtime.reducedMotion) {
-      controls.renderStatic()
-      return
-    }
-
     if (runtime.isActive) {
       controls.start()
       return
     }
 
     controls.renderStatic()
-  }, [runtime.isActive, runtime.reducedMotion])
+  }, [runtime.isActive])
 }

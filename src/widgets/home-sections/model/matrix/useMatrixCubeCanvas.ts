@@ -233,9 +233,7 @@ export function useMatrixCubeCanvas(
     // Expone controles imperativos para cambios de actividad y reduced-motion.
     controlsRef.current = { renderStatic, start, stop }
 
-    if (runtimeRef.current.reducedMotion) {
-      renderStatic()
-    } else if (runtimeRef.current.isActive) {
+    if (runtimeRef.current.isActive) {
       start()
     } else {
       draw(1)
@@ -254,16 +252,11 @@ export function useMatrixCubeCanvas(
     const controls = controlsRef.current
     if (!controls) return
 
-    if (runtime.reducedMotion) {
-      controls.renderStatic()
-      return
-    }
-
     if (runtime.isActive) {
       controls.start()
       return
     }
 
     controls.stop()
-  }, [runtime.isActive, runtime.reducedMotion])
+  }, [runtime.isActive])
 }

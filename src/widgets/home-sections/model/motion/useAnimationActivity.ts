@@ -87,7 +87,7 @@ export function useAnimationActivity(
   }, [])
 
   return {
-    isActive: isInView && isPageVisible && !reducedMotion,
+    isActive: isInView && isPageVisible,
     isInView,
     isPageVisible,
     reducedMotion,
