@@ -1,16 +1,57 @@
+/**
+ * Núcleo matemático y de configuración para renderizar un cubo con estética "Matrix".
+ *
+ * Este archivo no dibuja por sí solo toda la animación final, pero sí concentra las piezas base
+ * que otro módulo necesita para hacerlo:
+ *
+ * 1) Tipos de datos para vectores, puntos 2D, colores RGB y configuración.
+ * 2) Presets de calidad para adaptar el efecto a distintos dispositivos.
+ * 3) Geometría del cubo: vértices, aristas y caras.
+ * 4) Utilidades de color.
+ * 5) Utilidades matemáticas para rotación, proyección y operaciones vectoriales.
+ *
+ * La idea general es separar la lógica reusable del render para que el resto del sistema quede
+ * más limpio y no mezcle configuración visual con matemáticas 3D.
+ */
+
+/**
+ * Vector 3D representado como tupla fija:
+ * [x, y, z]
+ *
+ * Se usa en lugar de un objeto para mantener operaciones compactas y rápidas.
+ */
 export type V3 = [number, number, number]
 
+/**
+ * Punto proyectado en 2D después de aplicar perspectiva.
+ *
+ * - x, y: coordenadas finales en pantalla o canvas.
+ * - scale: factor de escala calculado por la proyección en perspectiva.
+ *   Este valor puede reutilizarse para grosor, opacidad o tamaño aparente.
+ */
 export type P2 = {
   scale: number
   x: number
   y: number
 }
 
+/**
+ * Punto 2D simple.
+ *
+ * Se utiliza sobre todo en pruebas geométricas como "point in polygon".
+ */
 export type Pt = {
   x: number
   y: number
 }
 
+/**
+ * Color RGB clásico.
+ *
+ * El orden interno de las propiedades es r, g, b a nivel conceptual,
+ * aunque el type declaration aparezca con b, g, r. TypeScript no depende
+ * del orden de las claves, sino de sus nombres.
+ */
 export type Rgb = {
   b: number
   g: number
