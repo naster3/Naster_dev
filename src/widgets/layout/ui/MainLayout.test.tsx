@@ -1,13 +1,30 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+
+const { trackPortfolioEvent } = vi.hoisted(() => ({
+  trackPortfolioEvent: vi.fn(),
+}))
+
+vi.mock('@/shared', async () => {
+  const actual = await vi.importActual<typeof import('@/shared')>('@/shared')
+  return {
+    ...actual,
+    trackPortfolioEvent,
+  }
+})
+
 import { MainLayout } from './MainLayout'
 
 describe('MainLayout', () => {
-  const renderLayout = () =>
+  beforeEach(() => {
+    trackPortfolioEvent.mockClear()
+  })
+
+  const renderLayout = (route = '/') =>
     render(
-      <MemoryRouter initialEntries={['/']}>
+      <MemoryRouter initialEntries={[route]}>
         <MainLayout>
           <div>Contenido</div>
         </MainLayout>
@@ -38,5 +55,25 @@ describe('MainLayout', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /Abrir menu/i })).toBeInTheDocument()
     })
+  })
+
+  it('trackea clicks en el logo y en el link de GitHub del header', async () => {
+    const user = userEvent.setup()
+    renderLayout()
+
+    await user.click(screen.getByRole('link', { name: /Naster Dev logo/i }))
+    await user.click(screen.getAllByRole('link', { name: /GitHub/i })[0])
+
+    expect(trackPortfolioEvent).toHaveBeenCalledWith('header_logo_click', { target: 'home' })
+    expect(trackPortfolioEvent).toHaveBeenCalledWith('cta_click', {
+      source: 'header',
+      target: 'github',
+    })
+  })
+
+  it('usa espaciado de pagina interna cuando la ruta no es home', () => {
+    renderLayout('/proyectos')
+
+    expect(screen.getByText('Contenido').parentElement).toHaveClass('py-10')
   })
 })

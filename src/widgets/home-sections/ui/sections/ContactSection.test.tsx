@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { ContactSection } from './ContactSection'
@@ -156,5 +156,71 @@ describe('ContactSection', () => {
     await waitFor(() => {
       expect(screen.queryByText(/Formulario temporalmente no disponible/i)).not.toBeInTheDocument()
     })
+  })
+
+  it('bloquea endpoints fuera de la allowlist', async () => {
+    vi.stubEnv('VITE_CONTACT_FORM_ENDPOINT', 'https://evil.example.com/contact')
+    vi.stubEnv('VITE_CONTACT_ALLOWED_HOSTS', 'formspree.io')
+    const fetchMock = vi.fn()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    const user = userEvent.setup()
+    render(<ContactSection />)
+
+    await user.type(screen.getByLabelText(/Nombre/i), 'Manuel')
+    await user.type(screen.getByLabelText(/Email/i), 'manuel@email.com')
+    await user.type(screen.getByLabelText(/Mensaje/i), 'Hola, quiero colaborar.')
+    await user.click(screen.getByRole('button', { name: /Enviar/i }))
+
+    expect(await screen.findByText(/Formulario temporalmente no disponible/i)).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('acepta el honeypot como exito falso y evita la llamada de red', async () => {
+    vi.stubEnv('VITE_CONTACT_FORM_ENDPOINT', 'https://example.com/contact')
+    const fetchMock = vi.fn()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    render(<ContactSection />)
+
+    fireEvent.input(screen.getByLabelText(/Nombre/i), { target: { value: 'Manuel' } })
+    fireEvent.input(screen.getByLabelText(/Email/i), { target: { value: 'manuel@email.com' } })
+    fireEvent.input(screen.getByLabelText(/Mensaje/i), {
+      target: { value: 'Necesito una API con autenticacion.' },
+    })
+    const honeypot = document.querySelector('input[name="company"]') as HTMLInputElement
+    fireEvent.input(honeypot, { target: { value: 'bot-company' } })
+    fireEvent.submit(honeypot.form as HTMLFormElement)
+
+    expect(await screen.findByText(/Mensaje enviado correctamente/i)).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('valida email invalido y limites de longitud', async () => {
+    vi.stubEnv('VITE_CONTACT_FORM_ENDPOINT', 'https://example.com/contact')
+    const fetchMock = vi.fn()
+    globalThis.fetch = fetchMock as unknown as typeof fetch
+
+    render(<ContactSection />)
+
+    const nameInput = screen.getByLabelText(/Nombre/i) as HTMLInputElement
+    const emailInput = screen.getByLabelText(/Email/i) as HTMLInputElement
+    const messageInput = screen.getByLabelText(/Mensaje/i) as HTMLTextAreaElement
+    const form = screen.getByRole('form', { name: /Formulario de contacto/i })
+
+    fireEvent.input(nameInput, { target: { value: 'M'.repeat(121) } })
+    fireEvent.input(emailInput, { target: { value: 'correo-invalido' } })
+    fireEvent.input(messageInput, { target: { value: 'x'.repeat(4001) } })
+
+    expect(nameInput.value).toHaveLength(121)
+    expect(emailInput.value).toBe('correo-invalido')
+    expect(messageInput.value).toHaveLength(4001)
+
+    fireEvent.submit(form)
+
+    expect(await screen.findByText(/El nombre es demasiado largo/i)).toBeInTheDocument()
+    expect(await screen.findByText(/Escribe un email válido/i)).toBeInTheDocument()
+    expect(await screen.findByText(/El mensaje es demasiado largo/i)).toBeInTheDocument()
+    expect(fetchMock).not.toHaveBeenCalled()
   })
 })
