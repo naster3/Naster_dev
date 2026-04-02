@@ -20,7 +20,6 @@ export default defineConfig({
     hookTimeout: 15000,
     exclude: ['tests/e2e/**', 'playwright.config.ts'],
     coverage: {
-      all: true,
       include: ['src/**/*.{ts,tsx}'],
       exclude: [
         'src/**/*.test.{ts,tsx}',
